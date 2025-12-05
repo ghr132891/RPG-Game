@@ -1,36 +1,3 @@
-%YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d08c7f3cf86261d40842ca83c6c87189, type: 3}
-  m_Name: Skill Data - Time Shard
-  m_EditorClassIdentifier: 
-  skillName: Time Shard
-  skillDescription: 'Creat a time shard filled  with elemenatl magic.
-
-    The shard
-    explodes when touched by enemies or when time goes up.'
-  icon: {fileID: -924274581, guid: 52321c17135d69243b2029cd4cf5edaf, type: 3}
-  cost: 0
-  skillType: 2
-  unlockedBydefault: 0
-  upgradeData:
-    skillUpgradeType: 6
-    cooldown: 1
-    damageScaleData:
-      phyiscal: 1
-      elemental: 0
-      chillDuration: 0
-      chillSlowMulitplier: 0
-      burnDuration: 0
-      burnDamageScale: 1
-      shockDuration: 2
-      shockDamageScale: 1
-      shockCharge: 0.4
+version https://git-lfs.github.com/spec/v1
+oid sha256:d0f1f1c771ba04f42b6a02470a1d535e5a54e99b65aa43dad050aa2fb70e40a1
+size 991

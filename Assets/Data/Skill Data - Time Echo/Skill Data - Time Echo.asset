@@ -1,23 +1,3 @@
-%YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d08c7f3cf86261d40842ca83c6c87189, type: 3}
-  m_Name: Skill Data - Time Echo
-  m_EditorClassIdentifier: 
-  cost: 1
-  skillType: 0
-  unlockedBydefault: 0
-  upgradeData:
-    skillUpgradeType: 0
-    cooldown: 0
-  skillName: Time Echo
-  skillDescription: "Creat a time echo of yourself.\nThe echo will distracts enemies.\n\n "
-  icon: {fileID: 712805365, guid: 52321c17135d69243b2029cd4cf5edaf, type: 3}
+version https://git-lfs.github.com/spec/v1
+oid sha256:a3d8f52a8d1e143bfc84ff10bdc9d24f4910cf89ab3117a19c217090c7b0a662
+size 706
