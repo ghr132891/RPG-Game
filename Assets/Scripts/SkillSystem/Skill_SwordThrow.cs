@@ -33,7 +33,10 @@ public class Skill_SwordThrow : Skill_Base
     public override bool CanUseSkill()
     {
         if (currentSword != null)
+        {
+            currentSword.GetSwordBackToPlayer();
             return false;
+        }
 
         return base.CanUseSkill();
 
@@ -46,7 +49,7 @@ public class Skill_SwordThrow : Skill_Base
 
         currentSword = newSword.GetComponent<SkillObject_Sword>();
         currentSword.SetupSword(this,GetThrowPower());
-        Debug.Log("FIRST commit");
+        
 
     }
 

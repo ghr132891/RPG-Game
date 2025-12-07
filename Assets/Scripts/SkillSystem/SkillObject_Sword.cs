@@ -6,10 +6,18 @@ public class SkillObject_Sword : SkillObject_Base
     protected Skill_SwordThrow swordManager;
     protected Rigidbody2D rb;
 
+    protected Transform playerTransform;
+    protected bool shouldComeback;
+    protected float comebackSpeed =30;
+
+    protected float maxAllowedDistance = 25;
+
 
     private void Update()
     {
         transform.right = rb.linearVelocity;
+
+        HandleComeback();
     }
     public virtual void SetupSword(Skill_SwordThrow swordManager,Vector2 direction)
     {
@@ -18,8 +26,30 @@ public class SkillObject_Sword : SkillObject_Base
 
         this.swordManager = swordManager;
 
+        playerTransform = swordManager.transform.root;
+
         playerStats = swordManager.player.stats;
         damageScaleData = swordManager.damageScaleData;
+
+    }
+
+    public void GetSwordBackToPlayer() => shouldComeback = true;
+
+    protected void HandleComeback()
+    {
+        float distacne = Vector2.Distance(transform.position, playerTransform.position);
+
+        if(distacne > maxAllowedDistance)
+            GetSwordBackToPlayer();
+
+        if (shouldComeback == false)
+            return;
+
+        transform.position = Vector2.MoveTowards(transform.position,playerTransform.position,comebackSpeed * Time.deltaTime);
+
+        if (distacne < .5f)
+            Destroy(gameObject);
+
 
     }
 

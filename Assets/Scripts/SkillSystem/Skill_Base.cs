@@ -19,6 +19,7 @@ public class Skill_Base : MonoBehaviour
         player = GetComponentInParent<Player>();
 
         lastTimeUsed -= cooldown;
+        damageScaleData = new DamageScaleData();
     }
 
     public virtual void TryUseSkill()

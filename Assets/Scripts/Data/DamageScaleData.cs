@@ -6,21 +6,21 @@ using UnityEngine;
 public class DamageScaleData
 {
     [Header("Damge")]
-    public float phyiscal;
-    public float elemental;
+    public float phyiscal =1;
+    public float elemental =1 ;
 
     [Header("Chill")]
-    public float chillDuration;
-    public float chillSlowMulitplier;
+    public float chillDuration = 3;
+    public float chillSlowMulitplier =.2f ;
 
     [Header("Burn")]
-    public float burnDuration;
-    public float burnDamageScale;
+    public float burnDuration = 3;
+    public float burnDamageScale =1;
 
     [Header("Shock")]
-    public float shockDuration;
-    public float shockDamageScale;
-    public float shockCharge;
+    public float shockDuration =3 ;
+    public float shockDamageScale =1 ;
+    public float shockCharge = .4f;
 
 
 

@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class SkillObject_Base : MonoBehaviour
 {
+
+    [SerializeField] protected GameObject onHitVfx;
+    [Space]
     [SerializeField] protected LayerMask whatIsEnemy;
     [SerializeField] protected Transform targetCheck;
     [SerializeField] protected float checkRadius = 1;
@@ -9,6 +12,7 @@ public class SkillObject_Base : MonoBehaviour
     protected Entity_Stats playerStats;
     protected DamageScaleData damageScaleData;
     protected ElementType usedElement;
+    protected bool targetGotHit;
 
 
 
@@ -35,14 +39,21 @@ public class SkillObject_Base : MonoBehaviour
             ElementType element = attackData.element;
 
 
-            damagable.TakeDamage(physDamage, elemDamage, element, transform);
+            targetGotHit = damagable.TakeDamage(physDamage, elemDamage, element, transform);
 
             if (element != ElementType.None)
                 entity_StatusHandler?.ApplyStatusEffect(element,attackData.effectData);
 
-            usedElement = element;
-        }
+            if (targetGotHit)
+                Instantiate(onHitVfx,target.transform.position,Quaternion.identity);
 
+            usedElement = element;
+
+            
+        }
+       
+        
+        
 
     }
 
