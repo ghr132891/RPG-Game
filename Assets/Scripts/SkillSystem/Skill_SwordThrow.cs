@@ -9,6 +9,10 @@ public class Skill_SwordThrow : Skill_Base
     [SerializeField] private float throwPower = 4f;
     [SerializeField] private GameObject swordPrefab;
 
+    [Header("Pierce Sword Upgrade")]
+    [SerializeField] private GameObject pierceSwordPrefab;
+    public int amountToPierce = 2;
+
 
     [Header("Traiectory prediction")]
     [SerializeField] private GameObject predictionDot;
@@ -43,8 +47,24 @@ public class Skill_SwordThrow : Skill_Base
 
     }
 
+    private GameObject GetSwordPrefab()
+    {
+        if(Unlocked(SkillUpgradeType.SwordThrow))
+            return swordPrefab;
+
+        if(Unlocked(SkillUpgradeType.SwordThrow_Pierce))
+            return pierceSwordPrefab;
+
+        Debug.Log("No valied sword upgrade selected.");
+        return null;
+
+
+    }
+
     public void ThrowSword()
     {
+        GameObject swordPrefab = GetSwordPrefab();
+
         GameObject newSword = Instantiate(swordPrefab, dots[1].position,Quaternion.identity);
 
         currentSword = newSword.GetComponent<SkillObject_Sword>();
