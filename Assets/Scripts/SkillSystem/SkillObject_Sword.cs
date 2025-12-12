@@ -13,7 +13,7 @@ public class SkillObject_Sword : SkillObject_Base
     protected float maxAllowedDistance = 25;
 
 
-    private void Update()
+    protected virtual void Update()
     {
         transform.right = rb.linearVelocity;
 

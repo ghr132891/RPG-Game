@@ -9,12 +9,16 @@ public class SkillObject_Base : MonoBehaviour
     [SerializeField] protected Transform targetCheck;
     [SerializeField] protected float checkRadius = 1;
 
+    protected Animator anim;
     protected Entity_Stats playerStats;
     protected DamageScaleData damageScaleData;
     protected ElementType usedElement;
     protected bool targetGotHit;
 
-
+    private void Awake()
+    {
+        anim = GetComponentInChildren<Animator>();
+    }
 
     protected Collider2D[] EnemiesAround(Transform t, float radius)
     {

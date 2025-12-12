@@ -5,13 +5,19 @@ public class Skill_SwordThrow : Skill_Base
     private SkillObject_Sword currentSword;
 
     [Header("Regular Sword Upgrade")]
-    [Range(0,10)]
+    [Range(0, 10)]
     [SerializeField] private float throwPower = 4f;
     [SerializeField] private GameObject swordPrefab;
 
     [Header("Pierce Sword Upgrade")]
     [SerializeField] private GameObject pierceSwordPrefab;
     public int amountToPierce = 2;
+
+    [Header("Spin Sword Upgrade")]
+    [SerializeField] private GameObject spinSwordPrefab;
+    public int maxDistance = 5;
+    public float attackPerSecond = 6;
+    public float maxSpinDuration = 5;
 
 
     [Header("Traiectory prediction")]
@@ -49,11 +55,14 @@ public class Skill_SwordThrow : Skill_Base
 
     private GameObject GetSwordPrefab()
     {
-        if(Unlocked(SkillUpgradeType.SwordThrow))
+        if (Unlocked(SkillUpgradeType.SwordThrow))
             return swordPrefab;
 
-        if(Unlocked(SkillUpgradeType.SwordThrow_Pierce))
+        if (Unlocked(SkillUpgradeType.SwordThrow_Pierce))
             return pierceSwordPrefab;
+
+        if(Unlocked(SkillUpgradeType.SwordThrow_Spin))
+            return spinSwordPrefab;
 
         Debug.Log("No valied sword upgrade selected.");
         return null;
@@ -65,11 +74,11 @@ public class Skill_SwordThrow : Skill_Base
     {
         GameObject swordPrefab = GetSwordPrefab();
 
-        GameObject newSword = Instantiate(swordPrefab, dots[1].position,Quaternion.identity);
+        GameObject newSword = Instantiate(swordPrefab, dots[1].position, Quaternion.identity);
 
         currentSword = newSword.GetComponent<SkillObject_Sword>();
-        currentSword.SetupSword(this,GetThrowPower());
-        
+        currentSword.SetupSword(this, GetThrowPower());
+
 
     }
 
@@ -79,11 +88,11 @@ public class Skill_SwordThrow : Skill_Base
     {
         for (int i = 0; i < numberOfDots; ++i)
         {
-            dots[i].position = GetTrajectoryPoint(direction,i *spaceBetweenDots);
+            dots[i].position = GetTrajectoryPoint(direction, i * spaceBetweenDots);
         }
     }
 
-    private Vector2 GetTrajectoryPoint(Vector2 direction ,float t)
+    private Vector2 GetTrajectoryPoint(Vector2 direction, float t)
     {
         float scaledThrowPower = throwPower * 10;
 
@@ -102,7 +111,7 @@ public class Skill_SwordThrow : Skill_Base
 
     public void EnableDots(bool enable)
     {
-        foreach(Transform t in dots)
+        foreach (Transform t in dots)
             t.gameObject.SetActive(enable);
 
     }
@@ -113,7 +122,7 @@ public class Skill_SwordThrow : Skill_Base
 
         for (int i = 0; i < numberOfDots; i++)
         {
-            newDots[i] = Instantiate(predictionDot,transform.position,Quaternion.identity,transform).transform;
+            newDots[i] = Instantiate(predictionDot, transform.position, Quaternion.identity, transform).transform;
             newDots[i].gameObject.SetActive(false);
         }
 
