@@ -8,6 +8,7 @@ public class SkillObject_Base : MonoBehaviour
     [SerializeField] protected LayerMask whatIsEnemy;
     [SerializeField] protected Transform targetCheck;
     [SerializeField] protected float checkRadius = 1;
+    protected Rigidbody2D rb;
 
     protected Animator anim;
     protected Entity_Stats playerStats;
@@ -18,9 +19,10 @@ public class SkillObject_Base : MonoBehaviour
     private void Awake()
     {
         anim = GetComponentInChildren<Animator>();
+        rb = GetComponent<Rigidbody2D>();
     }
 
-    protected Collider2D[] EnemiesAround(Transform t, float radius)
+    protected Collider2D[] GetEnemiesAround(Transform t, float radius)
     {
         return Physics2D.OverlapCircleAll(t.position, radius, whatIsEnemy);
 
@@ -28,7 +30,7 @@ public class SkillObject_Base : MonoBehaviour
 
     protected void DamageEnemiesInRadius(Transform t, float radius)
     {
-        foreach (var target in EnemiesAround(t, radius))
+        foreach (var target in GetEnemiesAround(t, radius))
         {
             IDamagable damagable = target.GetComponent<IDamagable>();
 
@@ -66,7 +68,7 @@ public class SkillObject_Base : MonoBehaviour
         Transform target = null; 
         float closestDistance = Mathf.Infinity;
 
-        foreach(var enemy in EnemiesAround(transform, 10))
+        foreach(var enemy in GetEnemiesAround(transform, 10))
         {
             float distance = Vector2.Distance(transform.position,enemy.transform.position);
 

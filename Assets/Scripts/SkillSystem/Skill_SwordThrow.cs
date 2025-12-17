@@ -3,21 +3,33 @@ using UnityEngine;
 public class Skill_SwordThrow : Skill_Base
 {
     private SkillObject_Sword currentSword;
+    private float currentSwordPower;
 
     [Header("Regular Sword Upgrade")]
     [Range(0, 10)]
-    [SerializeField] private float throwPower = 4f;
+    [SerializeField] private float regularThrowPower = 4f;
     [SerializeField] private GameObject swordPrefab;
 
     [Header("Pierce Sword Upgrade")]
     [SerializeField] private GameObject pierceSwordPrefab;
     public int amountToPierce = 2;
+    [Range(0, 10)]
+    [SerializeField] private float pierceThrowPower = 4f;
 
     [Header("Spin Sword Upgrade")]
     [SerializeField] private GameObject spinSwordPrefab;
     public int maxDistance = 5;
     public float attackPerSecond = 6;
     public float maxSpinDuration = 5;
+    [Range(0, 10)]
+    [SerializeField] private float spinThrowPower = 4f;
+
+    [Header("Bounce Sword Upgrade")]
+    [SerializeField] private GameObject bounceSwordPrefab;
+    public int bounceCount = 5;
+    public float bounceSpeed = 15;
+    [Range(0, 10)]
+    [SerializeField] private float bounceThrowPower = 4f;
 
 
     [Header("Traiectory prediction")]
@@ -42,6 +54,7 @@ public class Skill_SwordThrow : Skill_Base
 
     public override bool CanUseSkill()
     {
+        UpdateSwordPower();
         if (currentSword != null)
         {
             currentSword.GetSwordBackToPlayer();
@@ -61,8 +74,10 @@ public class Skill_SwordThrow : Skill_Base
         if (Unlocked(SkillUpgradeType.SwordThrow_Pierce))
             return pierceSwordPrefab;
 
-        if(Unlocked(SkillUpgradeType.SwordThrow_Spin))
+        if (Unlocked(SkillUpgradeType.SwordThrow_Spin))
             return spinSwordPrefab;
+        if (Unlocked(SkillUpgradeType.SwordThrow_Bounce))
+            return bounceSwordPrefab;
 
         Debug.Log("No valied sword upgrade selected.");
         return null;
@@ -81,8 +96,26 @@ public class Skill_SwordThrow : Skill_Base
 
 
     }
+    private void UpdateSwordPower()
+    {
+        switch (skillUpgradeType)
+        {
+            case SkillUpgradeType.SwordThrow:
+                currentSwordPower = regularThrowPower;
+                break;
+            case SkillUpgradeType.SwordThrow_Pierce:
+                currentSwordPower = pierceThrowPower;
+                break;
+            case SkillUpgradeType.SwordThrow_Spin:
+                currentSwordPower = spinThrowPower;
+                break;
+            case SkillUpgradeType.SwordThrow_Bounce:
+                currentSwordPower = bounceThrowPower;
+                break;
+        }
+    }
 
-    private Vector2 GetThrowPower() => confirmedDirection * (throwPower * 10);
+    private Vector2 GetThrowPower() => confirmedDirection * (currentSwordPower * 10);
 
     public void PredictTrajectory(Vector2 direction)
     {
@@ -94,7 +127,7 @@ public class Skill_SwordThrow : Skill_Base
 
     private Vector2 GetTrajectoryPoint(Vector2 direction, float t)
     {
-        float scaledThrowPower = throwPower * 10;
+        float scaledThrowPower = currentSwordPower * 10;
 
         // This gives us the initial velocity - the starting speed and direction of the throw.
         Vector2 initialVelocity = direction * scaledThrowPower;

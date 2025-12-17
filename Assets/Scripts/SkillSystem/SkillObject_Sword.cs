@@ -4,7 +4,7 @@ using UnityEngine;
 public class SkillObject_Sword : SkillObject_Base
 {
     protected Skill_SwordThrow swordManager;
-    protected Rigidbody2D rb;
+    
 
     protected Transform playerTransform;
     protected bool shouldComeback;
@@ -21,7 +21,7 @@ public class SkillObject_Sword : SkillObject_Base
     }
     public virtual void SetupSword(Skill_SwordThrow swordManager,Vector2 direction)
     {
-        rb = GetComponent<Rigidbody2D>();
+        
         rb.linearVelocity = direction;
 
         this.swordManager = swordManager;
@@ -40,7 +40,11 @@ public class SkillObject_Sword : SkillObject_Base
         float distacne = Vector2.Distance(transform.position, playerTransform.position);
 
         if(distacne > maxAllowedDistance)
+        {
             GetSwordBackToPlayer();
+            rb.simulated = false;
+
+        }
 
         if (shouldComeback == false)
             return;

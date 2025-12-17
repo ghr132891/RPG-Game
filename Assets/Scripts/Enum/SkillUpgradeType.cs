@@ -21,8 +21,18 @@
     SwordThrow,// You can throw sword to damage enemies from range.
     SwordThrow_Spin,// Your sword will spin at one point and damage emeies. Like a chainraw.
     SwordThrow_Pierce,// Pierce sword will pierce N targets.
-    SwordThrow_Bounce // Bounce sword will bounce between emeies.
+    SwordThrow_Bounce,// Bounce sword will bounce between emeies.
 
+    // --------Time Echo Tree-------------
+    TimeEcho,// Creat a clone of a player,it can take damage from enemies.
+    TimeEcho_SingleAttack,// Time Echo can perform a single attack.
+    TimeEcho_MultiAttack,// Time Echo can perform N attacks.
+    TimeEcho_ChanceToMultiply,// Time Echo has a chance to creat another time echo when attacks.
+
+    TimeEcho_HealWisp,// When time echo dies it creats a wisps that files toward the player to heal it
+                      // Heal is to percantage of damage taken when died
+    TimeEcho_CleanseWisp,// Wisp will now remove negative effects from players.
+    TimeEcho_CooldownWisp// Wisp will reduce cooldown of all skills by N seconds.
 
 
 
