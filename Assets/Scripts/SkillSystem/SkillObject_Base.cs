@@ -15,6 +15,7 @@ public class SkillObject_Base : MonoBehaviour
     protected DamageScaleData damageScaleData;
     protected ElementType usedElement;
     protected bool targetGotHit;
+    protected Transform lastTarget;
 
     private void Awake()
     {
@@ -51,7 +52,10 @@ public class SkillObject_Base : MonoBehaviour
                 entity_StatusHandler?.ApplyStatusEffect(element,attackData.effectData);
 
             if (targetGotHit)
+            {
+                lastTarget = target.transform;
                 Instantiate(onHitVfx,target.transform.position,Quaternion.identity);
+            }
 
             usedElement = element;
 

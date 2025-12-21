@@ -27,7 +27,7 @@
     TimeEcho,// Creat a clone of a player,it can take damage from enemies.
     TimeEcho_SingleAttack,// Time Echo can perform a single attack.
     TimeEcho_MultiAttack,// Time Echo can perform N attacks.
-    TimeEcho_ChanceToMultiply,// Time Echo has a chance to creat another time echo when attacks.
+    TimeEcho_ChanceToDuplicate,// Time Echo has a chance to creat another time echo when attacks.
 
     TimeEcho_HealWisp,// When time echo dies it creats a wisps that files toward the player to heal it
                       // Heal is to percantage of damage taken when died

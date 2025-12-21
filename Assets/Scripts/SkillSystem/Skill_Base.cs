@@ -11,6 +11,7 @@ public class Skill_Base : MonoBehaviour
     [SerializeField] protected SkillUpgradeType skillUpgradeType;
     [SerializeField] protected float cooldown;
     private float lastTimeUsed;
+    protected Transform lastTarget;
 
 
     protected virtual void Awake()

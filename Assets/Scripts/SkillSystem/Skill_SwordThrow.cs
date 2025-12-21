@@ -51,6 +51,7 @@ public class Skill_SwordThrow : Skill_Base
         dots = GenerateDots();
 
     }
+   
 
     public override bool CanUseSkill()
     {
@@ -87,12 +88,14 @@ public class Skill_SwordThrow : Skill_Base
 
     public void ThrowSword()
     {
+       
         GameObject swordPrefab = GetSwordPrefab();
 
         GameObject newSword = Instantiate(swordPrefab, dots[1].position, Quaternion.identity);
 
         currentSword = newSword.GetComponent<SkillObject_Sword>();
         currentSword.SetupSword(this, GetThrowPower());
+      
 
 
     }
