@@ -11,6 +11,42 @@ public class Skill_TimeEcho : Skill_Base
     [SerializeField] private int maxAttacks = 3;
     [SerializeField] private float duplicateChance = .3f;
 
+    [Header("Heal Wisp Upgrades")]
+    [SerializeField] private float damagePercentHealed = .3f;
+    [SerializeField] private float cooldownReducedInSeconds;
+
+    public float GetPercentOfDamageHealed()
+    {
+        if (shouldBeWisp() == false)
+            return 0;
+        else return damagePercentHealed;
+
+    }
+
+    public float GetCooldownReduceInSeconds()
+    {
+        if (skillUpgradeType != SkillUpgradeType.TimeEcho_CooldownWisp)
+            return 0;
+        else return cooldownReducedInSeconds;
+
+    }
+
+    public bool CanRemoveNegativeEffects()
+    { 
+            return skillUpgradeType == SkillUpgradeType.TimeEcho_CleanseWisp;
+
+    }
+
+
+    public bool shouldBeWisp()
+    {
+        return skillUpgradeType == SkillUpgradeType.TimeEcho_HealWisp
+            || skillUpgradeType == SkillUpgradeType.TimeEcho_CleanseWisp
+            || skillUpgradeType == SkillUpgradeType.TimeEcho_CooldownWisp;
+
+    }
+
+
     public float GetDuplicateChance()
     {
         if (skillUpgradeType != SkillUpgradeType.TimeEcho_ChanceToDuplicate)
