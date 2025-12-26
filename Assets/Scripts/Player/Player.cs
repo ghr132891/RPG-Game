@@ -26,6 +26,7 @@ public class Player : Entity
     public Player_CounterAttackState counterAttackState { get; private set; }
 
     public Player_SwordThrowState swordThrowState { get; private set; }
+    public Player_DomainExpansionState domainExpansionState { get; private set; }
    
 
     [Header("Attack Details")]
@@ -34,6 +35,10 @@ public class Player : Entity
     public float attackVelocityDuration = .1f;
     public float comboResetTime = 1;
     private Coroutine queuedAttackCo;
+
+    [Header("Ultimate ability details")]
+    public float riseSpeed = 25f;
+    public float riseMaxDistance = 3;
 
     [Header("Movement Details")]
     public float moveSpeed;
@@ -46,6 +51,14 @@ public class Player : Entity
     [Space]
     public float dashDuration = .25f;
     public float dashSpeed = 20;
+
+    public float activeSlowMultiplier { get; private set; } =1;
+    public float GetMoveSpeed() => moveSpeed * activeSlowMultiplier;
+    public float GetJumpForce() => jumpForce * activeSlowMultiplier;
+    public float GetDashSpeed() => dashSpeed * activeSlowMultiplier;
+    public Vector2 GetWallJumpForce() => wallJumpForce * activeSlowMultiplier;
+    public Vector2 GetJumpAttackVelocity() => jumpAttackVelocity * activeSlowMultiplier;
+
 
     public Vector2 moveInput { get; private set; }
     public Vector2 mousePosition { get; private set; }
@@ -73,6 +86,7 @@ public class Player : Entity
         deadState = new Player_DeadState(this, stateMachine, "dead");
         counterAttackState = new Player_CounterAttackState(this, stateMachine, "counterAttack");
         swordThrowState = new Player_SwordThrowState(this,stateMachine,"swordThrow");
+        domainExpansionState = new Player_DomainExpansionState(this,stateMachine,"jumpFall");
     }
 
     protected override void Start()
@@ -85,42 +99,37 @@ public class Player : Entity
 
     protected override IEnumerator SlowDownEntityCo(float duration, float slowMultiplier)
     {
-        float originalMoveSpeed = moveSpeed;
-        float originalJumpForce = jumpForce;
-        float originalDashSpeed = dashSpeed;
-        float originalAnimSpeed = anim.speed;
-        Vector2 originalWallJumpForce = wallJumpForce;
-        Vector2 originalJumpAttackVelocity = jumpAttackVelocity;
+       
         Vector2[] originalAttackVelocity = attackVelocity;
 
-        float speedMultiplier = 1 - slowMultiplier;
+        activeSlowMultiplier = 1 - slowMultiplier;
 
-        moveSpeed = moveSpeed * speedMultiplier;
-        jumpForce = jumpForce * speedMultiplier;
-        dashSpeed = dashSpeed * speedMultiplier;
-        anim.speed = anim.speed * speedMultiplier;
-        wallJumpForce = wallJumpForce * speedMultiplier;
-        jumpAttackVelocity = jumpAttackVelocity * speedMultiplier;
+        anim.speed = anim.speed * activeSlowMultiplier;
+
 
         for (int i = 0; i < attackVelocity.Length; i++)
         {
-            attackVelocity[i] = attackVelocity[i] * speedMultiplier;
+            attackVelocity[i] = attackVelocity[i] * activeSlowMultiplier;
         }
 
         yield return new WaitForSeconds(duration);
 
-        moveSpeed = originalMoveSpeed;
-        jumpForce = originalJumpForce;
-        dashSpeed =originalDashSpeed;
-        anim.speed = originalAnimSpeed;
-        wallJumpForce = originalWallJumpForce;
-        jumpAttackVelocity = originalJumpAttackVelocity;
+        StopSlowDown();
+
+        
 
         for (int i = 0; i < attackVelocity.Length; i++)
         {
             attackVelocity[i] = originalAttackVelocity[i];
 
         }
+    }
+
+    public override void StopSlowDown()
+    {
+        activeSlowMultiplier = 1;
+        anim.speed = 1;
+        base.StopSlowDown();
     }
 
     public override void EntityDeath()

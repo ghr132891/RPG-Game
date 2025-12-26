@@ -32,7 +32,12 @@
     TimeEcho_HealWisp,// When time echo dies it creats a wisps that files toward the player to heal it
                       // Heal is to percantage of damage taken when died
     TimeEcho_CleanseWisp,// Wisp will now remove negative effects from players.
-    TimeEcho_CooldownWisp// Wisp will reduce cooldown of all skills by N seconds.
+    TimeEcho_CooldownWisp,// Wisp will reduce cooldown of all skills by N seconds.
+
+    // --------Domain Expansion Tree-------------
+    Domain_SlowingDown,// Create a area in which you slow down enemies by 90-100%. You can freely move and fight.
+    Domain_EchoSpam,// You an no longer move,but you spam enemies with Time Echo ability.
+    Domain_ShardSpam// You an no longer move,but you spam enemies with Time Shard ability.
 
 
 

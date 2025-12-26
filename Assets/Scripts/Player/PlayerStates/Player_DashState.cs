@@ -27,7 +27,7 @@ public class Player_DashState : PlayerState
     {
         base.Update();
         CancelDashIfNeeded();
-        player.SetVelocity(player.dashSpeed * dashDir,0);
+        player.SetVelocity(player.GetDashSpeed() * dashDir,0);
 
         if (stateTimer < 0)
             if (player.groundDetected)

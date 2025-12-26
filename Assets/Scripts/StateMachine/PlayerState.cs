@@ -29,6 +29,21 @@ public abstract class PlayerState : EntityState
 
             stateMachine.ChangeState(player.dashState);
         }
+
+        if(input.Player.UltimateSpell.WasPressedThisFrame() && skillManager.domainExpansion.CanUseSkill())
+        {
+            if (skillManager.domainExpansion.InstantDomain())
+            {
+                skillManager.domainExpansion.CreateDomain();
+            }
+            else
+            {
+                stateMachine.ChangeState(player.domainExpansionState);
+            }
+
+            skillManager.domainExpansion.SetSkillOnCooldown();
+
+        }
     }
 
 

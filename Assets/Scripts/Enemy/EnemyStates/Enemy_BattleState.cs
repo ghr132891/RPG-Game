@@ -23,7 +23,7 @@ public class Enemy_BattleState : EnemyState
         {
             
   
-            rb.linearVelocity = new Vector2(enemy.reteratVelocity.x * -DirectionToPlayer(), enemy.reteratVelocity.y);
+            rb.linearVelocity = new Vector2((enemy.reteratVelocity.x * enemy.activeSlowMultiplier) * -DirectionToPlayer(), enemy.reteratVelocity.y);
 
             enemy.HandleFlip(DirectionToPlayer());
         }
@@ -50,7 +50,7 @@ public class Enemy_BattleState : EnemyState
         if (WithinAttackRange() && enemy.PlayerDetected())
             stateMachine.ChangeState(enemy.attackState);
         else
-            enemy.SetVelocity(enemy.battleMoveSpeed * DirectionToPlayer(), rb.linearVelocity.y);
+            enemy.SetVelocity(enemy.GetBattleMoveSpeed() * DirectionToPlayer(), rb.linearVelocity.y);
 
        
 
