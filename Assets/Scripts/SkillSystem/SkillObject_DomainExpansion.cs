@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class SkillObject_DomainExpansion : SkillObject_Base
 {
-    private Skill_DomainExpansion domaonExpansion;
+    private Skill_DomainExpansion domainManager;
 
     private float duration;
     private float expandSpeed = 2;
@@ -13,12 +13,12 @@ public class SkillObject_DomainExpansion : SkillObject_Base
 
     public void SetUpDomain(Skill_DomainExpansion _DomainExpansion)
     {
-        this.domaonExpansion = _DomainExpansion;
+        this.domainManager = _DomainExpansion;
 
-        duration = domaonExpansion.GetDomainDuration();
-        float maxSize = domaonExpansion.maxDomainSize;
-        slowDownPercent = domaonExpansion.GetSlowPercentage();
-        expandSpeed = domaonExpansion.expandSpeed;
+        duration = domainManager.GetDomainDuration();
+        float maxSize = domainManager.maxDomainSize;
+        slowDownPercent = domainManager.GetSlowPercentage();
+        expandSpeed = domainManager.expandSpeed;
 
         targetScale = Vector3.one * maxSize;
         Invoke(nameof(ShrinkDomain), duration);
@@ -40,9 +40,18 @@ public class SkillObject_DomainExpansion : SkillObject_Base
         }
 
         if (isShrinking && sizeDiffrence < .1f)
-            Destroy(gameObject);
+        {
+            TerminateDomain();
+        }
 
     }
+
+    private void TerminateDomain()
+    {
+        domainManager.ClearTarget();
+        Destroy(gameObject);
+    }
+
     private void ShrinkDomain()
     {
         targetScale = Vector3.zero;
@@ -57,6 +66,7 @@ public class SkillObject_DomainExpansion : SkillObject_Base
             return;
         }
 
+        domainManager.AddTarget(enemy);
         enemy.SlowDownEntity(duration, slowDownPercent,true);
         
     }

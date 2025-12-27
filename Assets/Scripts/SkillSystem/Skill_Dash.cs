@@ -40,7 +40,7 @@ public class Skill_Dash : Skill_Base
 
     private void CreatClone()
     {
-        Debug.Log("Creat a clone.");
+        skillManager.timeEcho.CreatTimeEcho();
     }
 
 

@@ -1,8 +1,7 @@
-using Mono.Cecil.Cil;
 using System.Collections;
 using System.Text;
 using TMPro;
-using Unity.VisualScripting;
+
 using UnityEngine;
 
 public class UI_SkillToolTip : UI_ToolTip
@@ -12,6 +11,7 @@ public class UI_SkillToolTip : UI_ToolTip
 
     [SerializeField] private TextMeshProUGUI skillName;
     [SerializeField] private TextMeshProUGUI skillDescription;
+    [SerializeField] private TextMeshProUGUI skillCoolDown;
     [SerializeField] private TextMeshProUGUI skillRequirements;
 
 
@@ -45,8 +45,9 @@ public class UI_SkillToolTip : UI_ToolTip
 
         skillName.text = node.skillData.skillName;
         skillDescription.text = node.skillData.skillDescription;
+        skillCoolDown.text = "CoolDown " + node.skillData.upgradeData.cooldown + " s.";
 
-        string skillLockedText = GetColoredText(importantInfoHex,lockedSkillText);
+        string skillLockedText = GetColoredText(importantInfoHex, lockedSkillText);
         string requirements = node.isLocked ? skillLockedText : GetRequirements(node.skillData.cost, node.neededNodes, node.conflictNodes);
         skillRequirements.text = requirements;
 
@@ -55,10 +56,10 @@ public class UI_SkillToolTip : UI_ToolTip
 
     public void LockedSkillEffect()
     {
-        if(textEfectCo != null)
-            StopCoroutine(textEfectCo); 
+        if (textEfectCo != null)
+            StopCoroutine(textEfectCo);
 
-        textEfectCo = StartCoroutine(TextBlinkEfectCo(skillRequirements,.15f,3));
+        textEfectCo = StartCoroutine(TextBlinkEfectCo(skillRequirements, .15f, 3));
     }
     private IEnumerator TextBlinkEfectCo(TextMeshProUGUI text, float blinkInterval, int blinkCount)
     {
@@ -88,7 +89,7 @@ public class UI_SkillToolTip : UI_ToolTip
 
         foreach (var node in neededNodes)
         {
-            if(node == null) continue;
+            if (node == null) continue;
 
             string nodeColor = node.isUnlocked ? metConditionHex : notMetConditionHex;
             string nodeText = $" - {node.skillData.skillName}";
@@ -102,11 +103,11 @@ public class UI_SkillToolTip : UI_ToolTip
             return sb.ToString();
 
         sb.AppendLine(); // Space
-        sb.AppendLine(GetColoredText(importantInfoHex,"Locks out: "));
+        sb.AppendLine(GetColoredText(importantInfoHex, "Locks out: "));
 
-        foreach(var node in conflictNodes)
+        foreach (var node in conflictNodes)
         {
-            if(node == null) continue;
+            if (node == null) continue;
 
             string nodeText = $" - {node.skillData.skillName}";
             string finalNodeText = GetColoredText(importantInfoHex, nodeText);
@@ -118,6 +119,6 @@ public class UI_SkillToolTip : UI_ToolTip
         return sb.ToString();
     }
 
-    
-   
+
+
 }

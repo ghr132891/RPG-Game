@@ -95,6 +95,8 @@ public class Skill_SwordThrow : Skill_Base
 
         currentSword = newSword.GetComponent<SkillObject_Sword>();
         currentSword.SetupSword(this, GetThrowPower());
+
+        SetSkillOnCooldown();
       
 
 

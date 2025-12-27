@@ -32,6 +32,40 @@ public class Skill_Shard : Skill_Base
         playerHealth = GetComponentInParent<Entity_Health>();
     }
 
+    public void CreateShard()
+    {
+        float detonateTime = GetDetonateTime();
+
+        GameObject shard = Instantiate(shardPrefab, transform.position, Quaternion.identity);
+        currentShard = shard.GetComponent<SkillObject_Shard>();
+        currentShard.SetupShard(this);
+
+        if (Unlocked(SkillUpgradeType.Shard_Teleport) || Unlocked(SkillUpgradeType.Shard_TeleportHpRewind))
+        {
+            currentShard.OnExplode += ForceCooldown;
+        }
+
+    }
+
+    public void CreatRawShard(Transform target = null, bool shardsCanMove = false)
+    {
+
+        bool canMove = shardsCanMove != false ? shardsCanMove :
+            Unlocked(SkillUpgradeType.Shard_MoveToEnemy) || Unlocked(SkillUpgradeType.Shard_MultiCast);
+
+
+        GameObject shard = Instantiate(shardPrefab, transform.position, Quaternion.identity);
+
+        shard.GetComponent<SkillObject_Shard>().SetupShard(this, detonationTime, canMove, shardSpeed, target);
+
+    }
+
+    public void CreatDomainShard()
+    {
+
+
+
+    }
     public override void TryUseSkill()
     {
         if (CanUseSkill() == false)
@@ -43,13 +77,13 @@ public class Skill_Shard : Skill_Base
         if (Unlocked(SkillUpgradeType.Shard_MoveToEnemy))
             HandleShardMoving();
 
-        if(Unlocked(SkillUpgradeType.Shard_MultiCast))
+        if (Unlocked(SkillUpgradeType.Shard_MultiCast))
             HanldeShardMulticast();
 
         if (Unlocked(SkillUpgradeType.Shard_Teleport))
             HandleShardTeleport();
 
-        if(Unlocked(SkillUpgradeType.Shard_TeleportHpRewind))
+        if (Unlocked(SkillUpgradeType.Shard_TeleportHpRewind))
             HandleShardHealthRewind();
 
     }
@@ -73,7 +107,7 @@ public class Skill_Shard : Skill_Base
 
     private void HandleShardTeleport()
     {
-        if(currentShard == null)
+        if (currentShard == null)
         {
             CreateShard();
 
@@ -100,7 +134,7 @@ public class Skill_Shard : Skill_Base
 
     private void HanldeShardMulticast()
     {
-        if(currentCharges <= 0)
+        if (currentCharges <= 0)
             return;
 
         CreateShard();
@@ -118,7 +152,7 @@ public class Skill_Shard : Skill_Base
     {
         isRecharging = true;
 
-        while(currentCharges < maxCharges)
+        while (currentCharges < maxCharges)
         {
 
             yield return new WaitForSeconds(cooldown);
@@ -148,36 +182,11 @@ public class Skill_Shard : Skill_Base
         SetSkillOnCooldown();
     }
 
-    public void CreateShard()
-    {
-        float detonateTime = GetDetonateTime();
 
-        GameObject shard = Instantiate(shardPrefab, transform.position, Quaternion.identity);
-        currentShard = shard.GetComponent<SkillObject_Shard>();
-        currentShard.SetupShard(this);
-
-        if(Unlocked(SkillUpgradeType.Shard_Teleport) || Unlocked(SkillUpgradeType.Shard_TeleportHpRewind))
-        {
-            currentShard.OnExplode += ForceCooldown;
-        }
-
-    }
-
-    public void CreatRawShard()
-    {
-
-        bool canMove = Unlocked(SkillUpgradeType.Shard_MoveToEnemy) || Unlocked(SkillUpgradeType.Shard_MultiCast);
-
-
-        GameObject shard = Instantiate(shardPrefab, transform.position, Quaternion.identity);
-
-        shard.GetComponent<SkillObject_Shard>().SetupShard(this,detonationTime,canMove,shardSpeed);
-
-    }
 
     public float GetDetonateTime()
     {
-        if(Unlocked(SkillUpgradeType.Shard_Teleport) || Unlocked(SkillUpgradeType.Shard_TeleportHpRewind))
+        if (Unlocked(SkillUpgradeType.Shard_Teleport) || Unlocked(SkillUpgradeType.Shard_TeleportHpRewind))
         {
             return shardExistDuration;
         }

@@ -10,11 +10,12 @@ public class Entity_Health : MonoBehaviour, IDamagable
     private Entity_Stats entityStats;
 
     [SerializeField] protected float currentHealth;
-    [SerializeField] protected bool isDead;
     [Header("Health Regen")]
     [SerializeField] private float regenInterval = 1;
     [SerializeField] private bool canRegenerateHealth = true;
     public float lastDamageTaken { get; private set; }
+    public bool isDead { get; private set; }
+    protected bool canTakeDamage = true;
 
     [Header("On Damage Knockbacl")]
     [SerializeField] private Vector2 knockbackPower = new Vector2(1.5f, 2.5f);
@@ -37,18 +38,18 @@ public class Entity_Health : MonoBehaviour, IDamagable
     {
         if (entityStats == null)
             return;
-        
-            currentHealth = entityStats.GetMaxHealth();
-            UpdateHealthBar();
-            InvokeRepeating(nameof(RengenerateHealth), 0, regenInterval);
 
-        
+        currentHealth = entityStats.GetMaxHealth();
+        UpdateHealthBar();
+        InvokeRepeating(nameof(RengenerateHealth), 0, regenInterval);
+
+
 
     }
 
     public virtual bool TakeDamage(float damage, float elementalDamage, ElementType element, Transform damageDealer)
     {
-        if (isDead)
+        if (isDead || canTakeDamage == false)
             return false;
 
         if (AttackEvaded())
@@ -56,7 +57,7 @@ public class Entity_Health : MonoBehaviour, IDamagable
             Debug.Log($"{gameObject.name} evaded the attack!");
             return false;
         }
-     
+
         Entity_Stats atttackStats = damageDealer.GetComponent<Entity_Stats>();
         float armorReduction = atttackStats != null ? atttackStats.GetArmorReduction() : 0;
         float armorMitigation = entityStats != null ? entityStats.GetArmorMitigation(armorReduction) : 0;
@@ -76,7 +77,7 @@ public class Entity_Health : MonoBehaviour, IDamagable
         return true;
     }
 
-
+    public bool SetCanTakeDamage(bool canTakeDamage) => this.canTakeDamage = canTakeDamage;
 
     private bool AttackEvaded()
     {
