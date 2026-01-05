@@ -28,8 +28,8 @@ public class UI_ItemToolTip : UI_ToolTip
 
         foreach (var mod in item.Modifiers)
         {
-            string modType = mod.statType.ToString();
-            string modValue = mod.value.ToString();
+            string modType = GetStatNameByType(mod.statType);
+            string modValue = IsPercentageStat(mod.statType)? mod.value.ToString()+"%":mod.value.ToString();
             sb.AppendLine("+ " + modValue + " " + modType);
         }
 
