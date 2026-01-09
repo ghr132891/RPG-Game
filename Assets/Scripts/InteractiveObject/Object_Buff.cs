@@ -2,26 +2,18 @@ using System.Collections;
 using UnityEngine;
 
 [System.Serializable]
-public class Buff 
-{
-    public StatType type;
-    public float value;
 
-
-}
 
 
 public class Object_Buff : MonoBehaviour
 {
-    private SpriteRenderer sr;
-    private Entity_Stats statToModify;
+    private Player_Stats statToModify;
 
 
     [Header("Buff Details")]
-    [SerializeField] private Buff[] buffs;
+    [SerializeField] private BuffEffectData[] buffs;
     [SerializeField] private string buffName;
     [SerializeField] private float buffDuartion = 4;
-    [SerializeField] private bool canBeUsed = true;
 
 
 
@@ -32,8 +24,7 @@ public class Object_Buff : MonoBehaviour
     private Vector3 startPosition;
 
     private void Awake()
-    {
-        sr = GetComponentInChildren<SpriteRenderer>();
+    {      
         startPosition = transform.position;
     }
 
@@ -45,40 +36,16 @@ public class Object_Buff : MonoBehaviour
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (canBeUsed == false)
-            return;
+       ;
 
-        statToModify = collision.GetComponent<Entity_Stats>();
-        StartCoroutine(BuffCo(buffDuartion));
-    }
+        statToModify = collision.GetComponent<Player_Stats>();
 
-    private IEnumerator BuffCo(float duration)
-    {
-        canBeUsed = false;
-        sr.color = Color.clear;
-        ApplyBuff(true);
-
-        yield return new WaitForSeconds(duration);
-
-        Debug.Log("Buff is removed!");
-        ApplyBuff(false);
-
-        Destroy(gameObject);
-    }
-
-    private void ApplyBuff(bool apply)
-    {
-        foreach (var buff in buffs)
+        if (statToModify.CanApplyBuffOf(buffName))
         {
-            if(apply)
-                statToModify.GetStatByType(buff.type).AddModifier(buff.value, buffName);
-            else
-                statToModify.GetStatByType(buff.type).RemoveModifier(buffName);
-
-
+           statToModify.ApplyBuff(buffs,buffDuartion,buffName);
+            Destroy(gameObject);
         }
     }
 
-
-
+   
 }

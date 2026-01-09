@@ -24,8 +24,15 @@ public class UI_ItemSlot : MonoBehaviour,IPointerDownHandler,IPointerEnterHandle
     {
         if(inventory == null || itemInSLot.itemData.itemType == ItemType.Material)
             return;
+        if (itemInSLot.itemData.itemType == ItemType.Consumable)
+        {
+            if(itemInSLot.itemEffect.CanBeUsed() == false)
+                return;
 
-        inventory.TryEquipItem(itemInSLot);
+            inventory.TryUseItem(itemInSLot);
+        }
+        else
+            inventory.TryEquipItem(itemInSLot);
 
         if (inventory == null)
             ui.itemToolTip.ShowToolTip(false, null);

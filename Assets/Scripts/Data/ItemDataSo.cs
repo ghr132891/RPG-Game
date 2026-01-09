@@ -8,6 +8,9 @@ public class ItemDataSo : ScriptableObject
     public ItemType itemType;
     public int maxStackSize = 1;
 
+    [Header("Item effect")]
+    public ItemEffect_DataSo itemEffect;
+
 
 
 

@@ -43,14 +43,15 @@ public class UI_TreeNode : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
     public void Refund()
     {
-        if (isUnlocked == true)
-            skillTree.AddSkillPoints(skillData.cost);
-
+        if (isUnlocked == false || skillData.unlockedBydefault)
+            return;
 
         isUnlocked = false;
         isLocked = false;
 
         UpdateIconColor(GetColorByHex(lockedColorHex));
+
+        skillTree.AddSkillPoints(skillData.cost);
         treeConnectHandler.UnlockConnectionImage(false);
 
     }
@@ -77,14 +78,14 @@ public class UI_TreeNode : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
         foreach (var node in neededNodes)
         {
-            
+
             if (node.isUnlocked == false)
                 return false;
         }
 
         foreach (var node in conflictNodes)
         {
-            
+
             if (node.isUnlocked)
                 return false;
         }
@@ -98,7 +99,7 @@ public class UI_TreeNode : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     {
         foreach (var node in conflictNodes)
         {
-            
+
             node.isLocked = true;
             node.LockChildNodes();
         }
