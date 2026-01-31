@@ -25,20 +25,27 @@ public class UI_TreeNode : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     private Color lastColor;
 
 
-    private void Awake()
-    {
-        ui = GetComponentInParent<UI>();
-        rect = GetComponent<RectTransform>();
-        skillTree = GetComponentInParent<UI_SkillTree>();
-        treeConnectHandler = GetComponent<UI_TreeConnectHandler>();
-
-        UpdateIconColor(GetColorByHex(lockedColorHex));
-    }
 
     private void Start()
     {
+        UpdateIconColor(GetColorByHex(lockedColorHex));
+        UnlockDefaultSkills();
+         
+    }
+
+    public void UnlockDefaultSkills()
+    {
+        GetNeededComponents();
+
         if (skillData.unlockedBydefault)
             UnLock();
+    }
+    private void GetNeededComponents()
+    {
+        ui = GetComponentInParent<UI>();
+        rect = GetComponent<RectTransform>();
+        skillTree = GetComponentInParent<UI_SkillTree>(true);
+        treeConnectHandler = GetComponent<UI_TreeConnectHandler>();
     }
 
     public void Refund()
@@ -58,13 +65,20 @@ public class UI_TreeNode : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
     private void UnLock()
     {
+        if (isUnlocked)
+        {
+            Debug.Log("Skill is already unlocked");
+            return;
+
+        }
+
         isUnlocked = true;
         UpdateIconColor(Color.white);
         skillTree.RemoveSkillPoints(skillData.cost);
         LockConflictNodes();
         treeConnectHandler.UnlockConnectionImage(true);
 
-        skillTree.skillManager.GetSkillByType(skillData.skillType).SetSkillUpgrade(skillData.upgradeData);
+        skillTree.skillManager.GetSkillByType(skillData.skillType).SetSkillUpgrade(skillData);
 
     }
 

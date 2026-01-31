@@ -4,6 +4,7 @@ public class UI_SkillTree : MonoBehaviour
 {
     [SerializeField] private int skillPoints;
     [SerializeField] private UI_TreeConnectHandler[] parentNodes;
+    private UI_TreeNode[] allTreeNodes;
     public Player_SkillManager skillManager { get; private set; }
 
     public bool EnoughSkillPoints(int cost) => skillPoints >= cost;
@@ -11,13 +12,19 @@ public class UI_SkillTree : MonoBehaviour
 
     public void AddSkillPoints(int cost) => skillPoints += cost;
 
-    private void Awake()
-    {
-        skillManager = FindAnyObjectByType<Player_SkillManager>(); 
-    }
+
     private void Start()
     {
         UpdataAllConnections();
+    }
+
+    public void UnlockDefaultSkills()
+    {
+        skillManager = FindAnyObjectByType<Player_SkillManager>();
+        allTreeNodes = GetComponentsInChildren<UI_TreeNode>();
+
+        foreach(var node in allTreeNodes)
+            node.UnlockDefaultSkills();
     }
 
     [ContextMenu("Reset Skill Tree")]

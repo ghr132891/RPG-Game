@@ -5,6 +5,8 @@ using UnityEngine.UI;
 public class UI_InGame : MonoBehaviour
 {
     private Player player;
+    private UI_SkillSlot[] skillSlots;
+
 
     [SerializeField] private RectTransform healthRect;
     [SerializeField] private Slider healthSlider;
@@ -14,11 +16,24 @@ public class UI_InGame : MonoBehaviour
     private void Awake()
     {
         maxWidth = healthRect.sizeDelta.x;
+
+        skillSlots = GetComponentsInChildren<UI_SkillSlot>(true);
     }
     private void Start()
     {
         player = FindFirstObjectByType<Player>();
         player.health.OnHealthUpdate += UpdateHealthBar;
+    }
+
+    public UI_SkillSlot GetSkillSlot(SkillType skillType)
+    {
+        foreach (var slot in skillSlots)
+        {
+            if(slot.skillType == skillType)
+                return slot;
+        }
+
+        return null;
     }
 
     private void UpdateHealthBar()

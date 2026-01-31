@@ -1,5 +1,6 @@
 using UnityEngine;
 
+
 public class Skill_Base : MonoBehaviour
 {
     public Player player { get; private set; }
@@ -28,11 +29,15 @@ public class Skill_Base : MonoBehaviour
 
     }
 
-    public void SetSkillUpgrade(UpgradeData upgrade)
+    public void SetSkillUpgrade(Skill_DataSO skillData)
     {
+        UpgradeData upgrade =skillData.upgradeData;
+
         skillUpgradeType = upgrade.skillUpgradeType;
         cooldown = upgrade.cooldown;
         damageScaleData = upgrade.damageScaleData;
+
+        player.ui.inGameUI.GetSkillSlot(skillType).SetupSkillSlot(skillData);
         ResetCooldown();
 
     }
@@ -54,11 +59,21 @@ public class Skill_Base : MonoBehaviour
     protected bool Unlocked(SkillUpgradeType upgradeToCheck) => skillUpgradeType == upgradeToCheck;
 
     public bool OnCooldown() => Time.time < lastTimeUsed + cooldown;
-    public void SetSkillOnCooldown() => lastTimeUsed = Time.time;
+    public void SetSkillOnCooldown() 
+    {
+        player.ui.inGameUI.GetSkillSlot(skillType).StartCoolDown(cooldown);
+        lastTimeUsed = Time.time;
+    } 
+
 
     public void ReduceCooldownBy(float cooldownReduction) => lastTimeUsed += cooldownReduction;
 
-    public void ResetCooldown() => lastTimeUsed = Time.time - cooldown;
+    public void ResetCooldown() 
+    {
+        player.ui.inGameUI.GetSkillSlot(skillType).ResetCoolDown();
+
+        lastTimeUsed = Time.time - cooldown;
+    }
 
 
 }
