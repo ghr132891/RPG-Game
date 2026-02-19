@@ -22,7 +22,6 @@ public class Skill_TimeEcho : Skill_Base
         else return damagePercentHealed;
 
     }
-
     public float GetCooldownReduceInSeconds()
     {
         if (skillUpgradeType != SkillUpgradeType.TimeEcho_CooldownWisp)
@@ -30,14 +29,11 @@ public class Skill_TimeEcho : Skill_Base
         else return cooldownReducedInSeconds;
 
     }
-
     public bool CanRemoveNegativeEffects()
     { 
             return skillUpgradeType == SkillUpgradeType.TimeEcho_CleanseWisp;
 
     }
-
-
     public bool shouldBeWisp()
     {
         return skillUpgradeType == SkillUpgradeType.TimeEcho_HealWisp
@@ -45,8 +41,6 @@ public class Skill_TimeEcho : Skill_Base
             || skillUpgradeType == SkillUpgradeType.TimeEcho_CooldownWisp;
 
     }
-
-
     public float GetDuplicateChance()
     {
         if (skillUpgradeType != SkillUpgradeType.TimeEcho_ChanceToDuplicate)
@@ -54,7 +48,6 @@ public class Skill_TimeEcho : Skill_Base
         return duplicateChance;
 
     }
-
     public int GetMaxAttacks()
     {
         if (skillUpgradeType == SkillUpgradeType.TimeEcho_SingleAttack || skillUpgradeType == SkillUpgradeType.TimeEcho_ChanceToDuplicate)
@@ -65,7 +58,6 @@ public class Skill_TimeEcho : Skill_Base
         return 0;
 
     }
-
     public float GetEchoDuration()
     {
         return timeEchoDuration;
@@ -77,10 +69,8 @@ public class Skill_TimeEcho : Skill_Base
 
        
         CreatTimeEcho();
+        SetSkillOnCooldown();
     }
-
-
-
     public void CreatTimeEcho(Vector3? targetPosition = null)
     {
         Vector3 position = targetPosition ?? transform.position;

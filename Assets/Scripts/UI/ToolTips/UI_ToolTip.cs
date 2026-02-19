@@ -3,7 +3,7 @@ using UnityEngine;
 public class UI_ToolTip : MonoBehaviour
 {
     private RectTransform rect;
-    [SerializeField] private Vector2 offSet = new Vector2(300, 520);
+    [SerializeField] private Vector2 offSet = new Vector2(300, 20);
 
     protected virtual void Awake()
     {
@@ -26,7 +26,7 @@ public class UI_ToolTip : MonoBehaviour
 
     private void UpdatePosistion(RectTransform targetRect)
     {
-        float screenCenterX = Screen.width / 2;
+        float screenCenterX = Screen.width / 2f;
         float screenTop = Screen.height;
         float screenBottom = 0;
 

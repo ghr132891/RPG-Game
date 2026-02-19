@@ -117,7 +117,7 @@ public class Inventory_Storage : Inventory_Base
         }
 
         TriggerUpdateUI();
-        materialStash = materialStash.OrderBy(item => item.itemData.itemName).ToList();
+        materialStash = materialStash.OrderBy(item => item.itemData.name).ToList();
     }
 
     public Inventory_Item StackableInStash(Inventory_Item itemToAdd)

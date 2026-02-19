@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class Enemy : Entity
 {
+    public Entity_Stats stats { get; private set; }
+
     public Enemy_Health health { get; private set; }
     public Enemy_IdleState idleState;
     public Enemy_MoveState moveState;
@@ -43,6 +45,8 @@ public class Enemy : Entity
     {
         base.Awake();
         health = GetComponent<Enemy_Health>();
+        stats = GetComponent<Entity_Stats>();
+
     }
     protected override IEnumerator SlowDownEntityCo(float duration, float slowMultiplier)
     {

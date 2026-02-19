@@ -11,10 +11,10 @@ public class UI_ItemSlot : MonoBehaviour, IPointerDownHandler, IPointerEnterHand
     protected RectTransform rect;
 
     [Header("UI Slot SetUp")]
-    [SerializeField] private Image itemIcon;
-    [SerializeField] private TextMeshProUGUI itemStackSize;
+    [SerializeField] protected Image itemIcon;
+    [SerializeField] protected TextMeshProUGUI itemStackSize;
 
-    protected void Awake()
+    protected virtual void Awake()
     {
         rect = GetComponent<RectTransform>();
         ui = GetComponentInParent<UI>();
@@ -36,9 +36,7 @@ public class UI_ItemSlot : MonoBehaviour, IPointerDownHandler, IPointerEnterHand
 
             if (itemInSlot.itemData.itemType == ItemType.Consumable)
             {
-                if (itemInSlot.itemEffect.CanBeUsed() == false)
-                    return;
-
+                
                 inventory.TryUseItem(itemInSlot);
             }
             else
