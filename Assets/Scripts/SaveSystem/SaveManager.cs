@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class SaveManager : MonoBehaviour
 {
+    public static SaveManager instance;
     private FileDataHandler dataHandler;
     private GameData gameData;
     private List<ISaveable> allSaveables;
@@ -14,6 +15,10 @@ public class SaveManager : MonoBehaviour
     [SerializeField] private string fileName = "RPGGame.json";
     [SerializeField] private bool encrptData = true;
 
+    private void Awake()
+    {
+        instance = this;
+    }
 
     private IEnumerator Start()
     {
@@ -25,6 +30,7 @@ public class SaveManager : MonoBehaviour
         LoadGame();
     }
 
+    public GameData GetGameData() => gameData;
     private void LoadGame()
     {
         gameData = dataHandler.LoadData();

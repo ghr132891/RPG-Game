@@ -2,9 +2,6 @@ using System.Collections;
 using UnityEngine;
 
 [System.Serializable]
-
-
-
 public class Object_Buff : MonoBehaviour
 {
     private Player_Stats statToModify;

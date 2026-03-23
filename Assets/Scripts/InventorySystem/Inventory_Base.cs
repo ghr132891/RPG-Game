@@ -6,6 +6,7 @@ public class Inventory_Base : MonoBehaviour,ISaveable
 {
     protected Player player;
     public event Action OnInventoryChange;
+    [SerializeField] protected ItemListDataSo itemDataBase;
 
     public int maxInventorySize = 15;
     public List<Inventory_Item> itemList = new List<Inventory_Item>();

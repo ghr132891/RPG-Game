@@ -76,14 +76,24 @@ public class UI_TreeNode : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
         isUnlocked = true;
         UpdateIconColor(Color.white);
-        skillTree.RemoveSkillPoints(skillData.cost);
         LockConflictNodes();
+        skillTree.RemoveSkillPoints(skillData.cost);
         treeConnectHandler.UnlockConnectionImage(true);
 
         skillTree.skillManager.GetSkillByType(skillData.skillType).SetSkillUpgrade(skillData);
 
     }
 
+    public void UnlockWithSaveData()
+    {
+        isUnlocked = true;
+        UpdateIconColor(Color.white);
+        LockConflictNodes();
+
+        treeConnectHandler.UnlockConnectionImage(true);
+
+
+    }
     private bool CanBeUnlocked()
     {
         if (isUnlocked || isLocked)

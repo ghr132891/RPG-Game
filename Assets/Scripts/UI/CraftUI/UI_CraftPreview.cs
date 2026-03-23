@@ -18,7 +18,7 @@ public class UI_CraftPreview : MonoBehaviour
     {
         this.storage = storage;
 
-        craftPreviewSlots = GetComponentsInChildren<UI_CraftPreviewSlot>();
+        craftPreviewSlots = GetComponentsInChildren<UI_CraftPreviewSlot>(true);
         foreach (var slot in craftPreviewSlots)
             slot.gameObject.SetActive(false);
     }
