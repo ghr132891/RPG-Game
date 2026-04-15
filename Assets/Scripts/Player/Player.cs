@@ -65,8 +65,12 @@ public class Player : Entity
     public Vector2 GetWallJumpForce() => wallJumpForce * activeSlowMultiplier;
     public Vector2 GetJumpAttackVelocity() => jumpAttackVelocity * activeSlowMultiplier;
 
-
+    [Header("Input Info")]
     public Vector2 moveInput { get; private set; }
+    private Vector2 rawMoveInput;
+    public float xInput{ get; private set; }
+    public float yInput{ get; private set; }
+
     public Vector2 mousePosition { get; private set; }
 
     protected override void Awake()
@@ -107,7 +111,41 @@ public class Player : Entity
         stateMachine.Initialize(idleState);
     }
 
+    protected override void Update()
+    {
+        base.Update();
+        ApplyWorldMovementLogic();
+    }
     public void TeleportPlayer(Vector3 position) => transform.position = position;
+
+    private void ApplyWorldMovementLogic()
+    {
+        // 默认情况下，逻辑方向等于物理按键方向
+        moveInput = rawMoveInput;
+
+
+        // 核心植入：镜像世界判定
+        // 检查 WorldManager 实例是否存在，且当前是否为镜像世界
+        if (WorldManager.Instance != null && WorldManager.Instance.currentWorld == WorldType.Mirror)
+        {
+            moveInput = - moveInput; // 实时反转水平方向
+        }
+    }
+
+    public void SetTimeImmunity(bool isImmune)
+    {
+        if (isImmune)
+        {
+            // 让动画不受 Time.timeScale 影响
+            anim.updateMode = AnimatorUpdateMode.UnscaledTime;
+            // 如果有必要，Rigidbody2D 的更新也可以在这里处理，
+            // 但由于你在 State 中手动设置 Velocity，通常改 Animator 就够了
+        }
+        else
+        {
+            anim.updateMode = AnimatorUpdateMode.Normal;
+        }
+    }
 
     protected override IEnumerator SlowDownEntityCo(float duration, float slowMultiplier)
     {
@@ -195,8 +233,8 @@ public class Player : Entity
 
         input.Player.Mouse.performed += ctx => mousePosition = ctx.ReadValue<Vector2>();
 
-        input.Player.Movement.performed += ctx => moveInput = ctx.ReadValue<Vector2>();
-        input.Player.Movement.canceled += ctx => moveInput = Vector2.zero;
+        input.Player.Movement.performed += ctx => rawMoveInput = ctx.ReadValue<Vector2>();
+        input.Player.Movement.canceled += ctx => rawMoveInput = Vector2.zero;
 
         input.Player.Spell.performed += ctx => skillManager.shard.TryUseSkill();
         input.Player.Spell.performed += ctx => skillManager.timeEcho.TryUseSkill();
