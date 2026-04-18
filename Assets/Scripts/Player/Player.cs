@@ -47,6 +47,7 @@ public class Player : Entity
     public float riseMaxDistance = 3;
 
     [Header("Movement Details")]
+    private float originalGravity;
     public float moveSpeed;
     public float jumpForce = 5;
     public Vector2 wallJumpForce;
@@ -59,11 +60,13 @@ public class Player : Entity
     public float dashSpeed = 20;
 
     public float activeSlowMultiplier { get; private set; } =1;
-    public float GetMoveSpeed() => moveSpeed * activeSlowMultiplier;
-    public float GetJumpForce() => jumpForce * activeSlowMultiplier;
-    public float GetDashSpeed() => dashSpeed * activeSlowMultiplier;
-    public Vector2 GetWallJumpForce() => wallJumpForce * activeSlowMultiplier;
-    public Vector2 GetJumpAttackVelocity() => jumpAttackVelocity * activeSlowMultiplier;
+    public float TimeScaleFix => (WorldManager.Instance != null && Time.timeScale < 1f)
+        ? (1f / WorldManager.Instance.timeWorldScale) : 1f;
+    public float GetMoveSpeed() => moveSpeed * activeSlowMultiplier * TimeScaleFix;
+    public float GetJumpForce() => jumpForce * activeSlowMultiplier * TimeScaleFix;
+    public float GetDashSpeed() => dashSpeed * activeSlowMultiplier * TimeScaleFix;
+    public Vector2 GetWallJumpForce() => wallJumpForce * activeSlowMultiplier * TimeScaleFix;
+    public Vector2 GetJumpAttackVelocity() => jumpAttackVelocity * activeSlowMultiplier * TimeScaleFix;
 
     [Header("Input Info")]
     public Vector2 moveInput { get; private set; }
@@ -108,6 +111,7 @@ public class Player : Entity
     protected override void Start()
     {
         base.Start();
+        originalGravity = GetComponent<Rigidbody2D>().gravityScale;
         stateMachine.Initialize(idleState);
     }
 
@@ -125,25 +129,27 @@ public class Player : Entity
 
 
         // 核心植入：镜像世界判定
-        // 检查 WorldManager 实例是否存在，且当前是否为镜像世界
-        if (WorldManager.Instance != null && WorldManager.Instance.currentWorld == WorldType.Mirror)
+        if (WorldManager.Instance != null && WorldManager.Instance.isMirrored)
         {
-            moveInput = - moveInput; // 实时反转水平方向
+            moveInput = -moveInput;
         }
     }
 
     public void SetTimeImmunity(bool isImmune)
     {
+        Rigidbody2D rb = GetComponent<Rigidbody2D>();
         if (isImmune)
         {
-            // 让动画不受 Time.timeScale 影响
             anim.updateMode = AnimatorUpdateMode.UnscaledTime;
-            // 如果有必要，Rigidbody2D 的更新也可以在这里处理，
-            // 但由于你在 State 中手动设置 Velocity，通常改 Animator 就够了
+
+            // 【终极解法】：重力必须按流速的平方倍增加，完美抵消慢动作下落！
+            float ts = WorldManager.Instance.timeWorldScale;
+            rb.gravityScale = originalGravity * (1f / (ts * ts));
         }
         else
         {
             anim.updateMode = AnimatorUpdateMode.Normal;
+            rb.gravityScale = originalGravity; // 恢复重力
         }
     }
 

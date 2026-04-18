@@ -11,6 +11,12 @@ public class Enemy_DeadState : EnemyState
 
     public override void Enter()
     {
+        TimeRewinder rewinder = enemy.GetComponent<TimeRewinder>();
+        if (rewinder != null)
+        {
+            rewinder.SetDead();
+        }
+
         anim.enabled = false;
         col.enabled = false;
 
@@ -18,6 +24,8 @@ public class Enemy_DeadState : EnemyState
         rb.linearVelocity = new Vector2(rb.linearVelocity.x,20);
 
         stateMachine.SwitchOffStateMachine();
+
+
 
         
     }

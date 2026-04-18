@@ -3,7 +3,7 @@ using UnityEngine;
 
 public struct PointInTime
 {
-    public Vector3 position;
+    public Vector3 localPosition;
     public Vector2 velocity;
     public int facingDir;
 }
@@ -16,6 +16,7 @@ public class TimeRewinder : MonoBehaviour
     private Rigidbody2D rb;
     private Entity entity;
 
+    private bool isDead;
     private bool isRewinding = false;
 
     // 【新增】：用于记录真实的刚体类型，避免 isKinematic 警告
@@ -33,6 +34,9 @@ public class TimeRewinder : MonoBehaviour
 
     private void CheckTimeWorld(WorldType worldType)
     {
+        if (isDead)
+            return;
+
         if (worldType == WorldType.Time)
             StartRewind();
         else
@@ -41,10 +45,31 @@ public class TimeRewinder : MonoBehaviour
 
     void FixedUpdate()
     {
+        // 【核心修复2：死亡判定】
+        // 这里需要对接你项目的真实死亡判定。
+        // 根据你之前的代码架构，你的 Entity 应该有类似 isDead 的属性，或者你可以通过判断它的状态
+        // 伪代码：如果 (entity.isDead == true) 或者 (血量 <= 0)
+        // 请把下方判断换成你项目中真实的死亡检测！比如 entity.stats.isDead 或者 GetComponent<Enemy_Health>().currentHealth <= 0
+        //if (entity != null && entity.isKnocked == false) // 假设我们先用伪逻辑占位
+        //{
+            // 如果你需要具体的死亡判断代码，告诉我你的 Entity.cs 里是怎么写死亡的！
+        //}
+
+        // 如果已经判定死亡，直接退出，不记录也不倒流
+        if (isDead) return;
+
         if (isRewinding)
             Rewind();
         else
             Record();
+    }
+
+    public void SetDead()
+    {
+        isDead = true;
+        pointsInTime.Clear(); // 清空历史记录
+        if (rb != null)
+            rb.bodyType = originalBodyType; // 恢复物理状态
     }
 
     void Rewind()
@@ -53,7 +78,7 @@ public class TimeRewinder : MonoBehaviour
         {
             PointInTime pointInTime = pointsInTime[0];
 
-            transform.position = pointInTime.position;
+            transform.localPosition = pointInTime.localPosition;
             if (entity != null && pointInTime.facingDir != entity.facingDir)
             {
                 entity.Flip();
@@ -80,7 +105,7 @@ public class TimeRewinder : MonoBehaviour
         }
 
         PointInTime point = new PointInTime();
-        point.position = transform.position;
+        point.localPosition = transform.localPosition;
         point.velocity = rb != null ? rb.linearVelocity : Vector2.zero;
         point.facingDir = entity != null ? entity.facingDir : 1;
 
@@ -89,6 +114,9 @@ public class TimeRewinder : MonoBehaviour
 
     public void StartRewind()
     {
+        if (isDead)
+            return;
+
         isRewinding = true;
         // 【修复】：记录原始状态，并使用 bodyType 替代 isKinematic
         if (rb != null)

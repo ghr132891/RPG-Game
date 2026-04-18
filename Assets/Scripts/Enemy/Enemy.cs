@@ -102,7 +102,7 @@ public class Enemy : Entity
     public RaycastHit2D PlayerDetected()
     {
         int actualFacingDir = facingDir;
-        if (WorldManager.Instance != null && WorldManager.Instance.currentWorld == WorldType.Mirror)
+        if (WorldManager.Instance != null && WorldManager.Instance.isMirrored)
         {
             actualFacingDir = -facingDir;
         }
@@ -121,7 +121,7 @@ public class Enemy : Entity
         int actualFacingDir = facingDir;
 
         // 加上 Application.isPlaying，防止在编辑模式下报错
-        if (Application.isPlaying && WorldManager.Instance != null && WorldManager.Instance.currentWorld == WorldType.Mirror)
+        if (Application.isPlaying && WorldManager.Instance != null && WorldManager.Instance.isMirrored)
         {
             actualFacingDir = -facingDir;
         }

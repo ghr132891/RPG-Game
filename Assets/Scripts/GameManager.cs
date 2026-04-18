@@ -160,7 +160,14 @@ public class GameManager : MonoBehaviour,ISaveable
         if (currentScene == "MainMenu")
             return;
 
-        gameData.lastPlayerPosition = Player.instance.transform.position;
+        Vector3 posToSave = Player.instance.transform.position;
+
+        if (WorldManager.Instance != null && WorldManager.Instance.currentWorld == WorldType.Mirror)
+        {
+            posToSave.x = -posToSave.x;
+        }
+
+        gameData.lastPlayerPosition = posToSave;
         gameData.lastScenePlayed = currentScene;
 
         dataLoaded = false;
