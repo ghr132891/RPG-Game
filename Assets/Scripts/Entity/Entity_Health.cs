@@ -39,10 +39,14 @@ public class Entity_Health : MonoBehaviour, IDamagable
         healthBar = GetComponentInChildren<Slider>();
         dropManager = GetComponent<Entity_DropManager>();
 
-        SetUpHealth();
     }
 
-  
+    protected virtual void Start()
+    {
+        SetUpHealth();
+        
+    }
+
     private void SetUpHealth()
     {
         if (entityStats == null)
@@ -52,10 +56,6 @@ public class Entity_Health : MonoBehaviour, IDamagable
         OnHealthUpdate += UpdateHealthBar;
         UpdateHealthBar();
         InvokeRepeating(nameof(RengenerateHealth), 0, regenInterval);
-        
-
-
-
     }
 
     public virtual bool TakeDamage(float damage, float elementalDamage, ElementType element, Transform damageDealer)

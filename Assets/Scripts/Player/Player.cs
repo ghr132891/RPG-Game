@@ -130,16 +130,10 @@ public class Player : Entity
     }
     private void ApplyWorldMovementLogic()
     {
-        // 默认情况下，逻辑方向等于物理按键方向
+
         moveInput = rawMoveInput;
 
-        /*
-        // 核心植入：镜像世界判定
-        if (WorldManager.Instance != null && WorldManager.Instance.isMirrored)
-        {
-            moveInput = -moveInput;
-        }
-        */
+
     }
 
     public void SetTimeImmunity(bool isImmune)

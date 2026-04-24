@@ -16,6 +16,9 @@ public class Enemy : Entity
     [Header("Battle Details")]
     public float battleMoveSpeed = 3;
     public float attackDistance = 2;
+    public float attackCooldown = .5f;
+    public bool canChasePlayer = true;
+    [Space]
     public float battleTimeDuration = 5;
     public float minAbleRetreatDistance = 1;
     public Vector2 reteratVelocity;
@@ -77,6 +80,10 @@ public class Enemy : Entity
         stateMachine.ChangeState(deadState);
     }
 
+    public void DestoryGameObjectWithDealy(float delay = 10)
+    {
+        Destroy(gameObject,delay);
+    }
 
     public void TryEnterBattleState(Transform player)
     {
