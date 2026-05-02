@@ -9,6 +9,11 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioSource sfxSource;
 
+    private AudioClip lastMusicPlayed;
+    private string currentAudioGroupName;
+    private Coroutine currentAudioCo;
+    [SerializeField] private bool audioShouldPlay;
+
     private Transform player;
 
     private void Awake()
@@ -21,6 +26,78 @@ public class AudioManager : MonoBehaviour
 
         instance = this;
         DontDestroyOnLoad(gameObject);
+    }
+
+    private void Update()
+    {
+        if (audioSource.isPlaying == false && audioShouldPlay)
+        {
+            if (string.IsNullOrEmpty(currentAudioGroupName) == false)
+                NextBGM(currentAudioGroupName);
+        }
+
+        if (audioSource.isPlaying && audioShouldPlay == false)
+            StopBGM();
+    }
+
+    public void StartBGM(string musicGroup)
+    {
+        audioShouldPlay = true;
+
+        if (musicGroup == currentAudioGroupName)
+            return;
+
+        NextBGM(musicGroup);
+    }
+    public void NextBGM(string musicGroup)
+    {
+        audioShouldPlay = true;
+        currentAudioGroupName = musicGroup;
+
+        if (currentAudioCo != null)
+            StopCoroutine(currentAudioCo);
+
+        currentAudioCo = StartCoroutine(SwitchMusicCo(musicGroup));
+    }
+    public void StopBGM()
+    {
+        audioShouldPlay = false;
+
+        StartCoroutine(FadeVolumeCo(audioSource, 0, 1));
+
+        if (currentAudioCo != null)
+            StopCoroutine(currentAudioCo);
+    }
+
+    private IEnumerator SwitchMusicCo(string musicGroup)
+    {
+        AudioClipData data = audioDataBase.Get(musicGroup);
+        AudioClip nextMusic = data.GetRandomClip();
+
+        if(data == null && data.clips.Count == 0)
+        {
+            Debug.Log("No audio found for group - " + musicGroup );
+            yield break;
+        }
+
+        if (data.clips.Count > 1)
+        {
+            while (nextMusic == lastMusicPlayed)
+                nextMusic = data.GetRandomClip();
+        }
+
+        if (audioSource.isPlaying)
+            yield return FadeVolumeCo(audioSource, 0, 1f);
+
+
+        lastMusicPlayed = nextMusic;
+        audioSource.clip = nextMusic;
+        audioSource.volume = 0;
+        audioSource.Play();
+
+        StartCoroutine(FadeVolumeCo(audioSource, data.maxVolume, 1f));
+
+
     }
 
     private IEnumerator FadeVolumeCo(AudioSource source, float targetVolume, float duration)
