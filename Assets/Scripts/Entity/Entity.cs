@@ -8,6 +8,7 @@ public class Entity : MonoBehaviour
     public event Action OnFlipped;
     public Animator anim { get; private set; }
     public Rigidbody2D rb { get; private set; }
+    public Entity_SFX entitySFX { get; private set; }
 
     protected StateMachine stateMachine;
 
@@ -37,7 +38,10 @@ public class Entity : MonoBehaviour
 
         rb = GetComponent<Rigidbody2D>();
 
+        entitySFX = GetComponent<Entity_SFX>();
+
         stateMachine = new StateMachine();
+        
 
 
 
