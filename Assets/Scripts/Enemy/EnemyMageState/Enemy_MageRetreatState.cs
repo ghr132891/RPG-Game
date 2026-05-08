@@ -32,17 +32,17 @@ public class Enemy_MageRetreatState : EnemyState
 
         bool rechedRetreatDistance = Vector2.Distance(enemy.transform.position, startPosition) >= enemyMage.retreatMaxDistance;
 
-        if (rechedRetreatDistance)
-        {
-            rb.linearVelocity = Vector2.zero;
-            enemy.vfx.StopImageEchoEffect();
-        }
+        if (rechedRetreatDistance || enemyMage.CanNotMoveBackwards())
+            stateMachine.ChangeState(enemyMage.mageSpellCastState);
+
+        
 
 
     }
     public override void Exit()
     {
         base.Exit();
+        enemy.vfx.StopImageEchoEffect();
         enemy.gameObject.layer = LayerMask.NameToLayer("Enemy");
     }
 
