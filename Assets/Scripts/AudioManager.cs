@@ -106,7 +106,7 @@ public class AudioManager : MonoBehaviour
         float time = 0;
         while (time < duration)
         {
-            time += Time.deltaTime;
+            time += Time.unscaledDeltaTime;
             source.volume = Mathf.Lerp(startVolume, targetVolume, time / duration);
             yield return null;
         }

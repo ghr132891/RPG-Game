@@ -37,7 +37,12 @@
     // --------Domain Expansion Tree-------------
     Domain_SlowingDown,// Create a area in which you slow down enemies by 90-100%. You can freely move and fight.
     Domain_EchoSpam,// You an no longer move,but you spam enemies with Time Echo ability.
-    Domain_ShardSpam// You an no longer move,but you spam enemies with Time Shard ability.
+    Domain_ShardSpam,// You an no longer move,but you spam enemies with Time Shard ability.
+
+    // -------------Switch World-------------
+    SwitchNormal,
+    SwitchMirror,
+    SwitchTime
 
 
 

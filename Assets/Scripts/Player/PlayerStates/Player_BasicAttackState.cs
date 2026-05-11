@@ -41,8 +41,11 @@ public class Player_BasicAttackState : PlayerState
         base.Update();
         HandleAttackVelocity();
 
+        // close combat attack
+        /*
         if (input.Player.Attack.WasPressedThisFrame())
             QueueNextAttack();
+        */
 
         if (triggerCalled)
             HandleStateExit();
@@ -50,11 +53,19 @@ public class Player_BasicAttackState : PlayerState
     public override void Exit()
     {
         base.Exit();
-        comboIndex++;
+
+        // close combat attack
+        //comboIndex++;
+
         lastTimeAttacked = Time.time;
     }
     private void HandleStateExit()
     {
+
+        stateMachine.ChangeState(player.idleState);
+
+        // close combat attack
+        /*
         if (comboAttackQueued)
         {
             anim.SetBool(animBoolName, false);
@@ -62,6 +73,7 @@ public class Player_BasicAttackState : PlayerState
         }
         else
             stateMachine.ChangeState(player.idleState);
+        */
     }
     private void QueueNextAttack()
     {

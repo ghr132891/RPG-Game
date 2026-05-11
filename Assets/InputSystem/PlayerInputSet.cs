@@ -198,6 +198,33 @@ public partial class @PlayerInputSet: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SwitchNormal"",
+                    ""type"": ""Button"",
+                    ""id"": ""3bb6d2a7-5377-4d5d-9d44-63ee16ae6fb3"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SwitchMirror"",
+                    ""type"": ""Button"",
+                    ""id"": ""ba9ab802-6530-4616-bbbc-5968cff3a4b0"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SwitchTime"",
+                    ""type"": ""Button"",
+                    ""id"": ""8f6caaec-0224-4ee5-946b-e3a2681ba0c1"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -332,6 +359,39 @@ public partial class @PlayerInputSet: IInputActionCollection2, IDisposable
                     ""action"": ""Interact"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""73f34798-c00b-47fd-9bec-7d9e08745142"",
+                    ""path"": ""<Keyboard>/1"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";keyboard & Mouse"",
+                    ""action"": ""SwitchNormal"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""04cb02ef-6c8c-412f-a3a8-2dccacec1d05"",
+                    ""path"": ""<Keyboard>/2"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";keyboard & Mouse"",
+                    ""action"": ""SwitchMirror"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4a5bf289-0113-41a2-a2a4-b00894f413e6"",
+                    ""path"": ""<Keyboard>/3"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";keyboard & Mouse"",
+                    ""action"": ""SwitchTime"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -424,6 +484,9 @@ public partial class @PlayerInputSet: IInputActionCollection2, IDisposable
         m_Player_Interact = m_Player.FindAction("Interact", throwIfNotFound: true);
         m_Player_QuickItemSlot_1 = m_Player.FindAction("QuickItemSlot_1", throwIfNotFound: true);
         m_Player_QuickItemSlot_2 = m_Player.FindAction("QuickItemSlot_2", throwIfNotFound: true);
+        m_Player_SwitchNormal = m_Player.FindAction("SwitchNormal", throwIfNotFound: true);
+        m_Player_SwitchMirror = m_Player.FindAction("SwitchMirror", throwIfNotFound: true);
+        m_Player_SwitchTime = m_Player.FindAction("SwitchTime", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_OptionsUI = m_UI.FindAction("OptionsUI", throwIfNotFound: true);
@@ -523,6 +586,9 @@ public partial class @PlayerInputSet: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Interact;
     private readonly InputAction m_Player_QuickItemSlot_1;
     private readonly InputAction m_Player_QuickItemSlot_2;
+    private readonly InputAction m_Player_SwitchNormal;
+    private readonly InputAction m_Player_SwitchMirror;
+    private readonly InputAction m_Player_SwitchTime;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -582,6 +648,18 @@ public partial class @PlayerInputSet: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/QuickItemSlot_2".
         /// </summary>
         public InputAction @QuickItemSlot_2 => m_Wrapper.m_Player_QuickItemSlot_2;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/SwitchNormal".
+        /// </summary>
+        public InputAction @SwitchNormal => m_Wrapper.m_Player_SwitchNormal;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/SwitchMirror".
+        /// </summary>
+        public InputAction @SwitchMirror => m_Wrapper.m_Player_SwitchMirror;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/SwitchTime".
+        /// </summary>
+        public InputAction @SwitchTime => m_Wrapper.m_Player_SwitchTime;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -644,6 +722,15 @@ public partial class @PlayerInputSet: IInputActionCollection2, IDisposable
             @QuickItemSlot_2.started += instance.OnQuickItemSlot_2;
             @QuickItemSlot_2.performed += instance.OnQuickItemSlot_2;
             @QuickItemSlot_2.canceled += instance.OnQuickItemSlot_2;
+            @SwitchNormal.started += instance.OnSwitchNormal;
+            @SwitchNormal.performed += instance.OnSwitchNormal;
+            @SwitchNormal.canceled += instance.OnSwitchNormal;
+            @SwitchMirror.started += instance.OnSwitchMirror;
+            @SwitchMirror.performed += instance.OnSwitchMirror;
+            @SwitchMirror.canceled += instance.OnSwitchMirror;
+            @SwitchTime.started += instance.OnSwitchTime;
+            @SwitchTime.performed += instance.OnSwitchTime;
+            @SwitchTime.canceled += instance.OnSwitchTime;
         }
 
         /// <summary>
@@ -691,6 +778,15 @@ public partial class @PlayerInputSet: IInputActionCollection2, IDisposable
             @QuickItemSlot_2.started -= instance.OnQuickItemSlot_2;
             @QuickItemSlot_2.performed -= instance.OnQuickItemSlot_2;
             @QuickItemSlot_2.canceled -= instance.OnQuickItemSlot_2;
+            @SwitchNormal.started -= instance.OnSwitchNormal;
+            @SwitchNormal.performed -= instance.OnSwitchNormal;
+            @SwitchNormal.canceled -= instance.OnSwitchNormal;
+            @SwitchMirror.started -= instance.OnSwitchMirror;
+            @SwitchMirror.performed -= instance.OnSwitchMirror;
+            @SwitchMirror.canceled -= instance.OnSwitchMirror;
+            @SwitchTime.started -= instance.OnSwitchTime;
+            @SwitchTime.performed -= instance.OnSwitchTime;
+            @SwitchTime.canceled -= instance.OnSwitchTime;
         }
 
         /// <summary>
@@ -957,6 +1053,27 @@ public partial class @PlayerInputSet: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnQuickItemSlot_2(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "SwitchNormal" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnSwitchNormal(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "SwitchMirror" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnSwitchMirror(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "SwitchTime" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnSwitchTime(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

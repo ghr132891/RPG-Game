@@ -37,7 +37,11 @@ public class Skill_Base : MonoBehaviour
         cooldown = upgrade.cooldown;
         damageScaleData = upgrade.damageScaleData;
 
-        player.ui.inGameUI.GetSkillSlot(skillType).SetupSkillSlot(skillData);
+        var uiSlot = player.ui.inGameUI.GetSkillSlot(skillType);
+        if (uiSlot != null)
+        {
+            uiSlot.SetupSkillSlot(skillData);
+        }
         ResetCooldown();
 
     }
@@ -62,7 +66,11 @@ public class Skill_Base : MonoBehaviour
     public bool OnCooldown() => Time.time < lastTimeUsed + cooldown;
     public void SetSkillOnCooldown()
     {
-        player.ui.inGameUI.GetSkillSlot(skillType).StartCoolDown(cooldown);
+        var uiSlot = player.ui.inGameUI.GetSkillSlot(skillType);
+        if (uiSlot != null)
+        {
+            uiSlot.StartCoolDown(cooldown);
+        }
         lastTimeUsed = Time.time;
     }
 
@@ -71,7 +79,11 @@ public class Skill_Base : MonoBehaviour
 
     public void ResetCooldown()
     {
-        player.ui.inGameUI.GetSkillSlot(skillType).ResetCoolDown();
+        var uiSlot = player.ui.inGameUI.GetSkillSlot(skillType);
+        if (uiSlot != null)
+        {
+            uiSlot.ResetCoolDown();
+        }
 
         lastTimeUsed = Time.time - cooldown;
     }

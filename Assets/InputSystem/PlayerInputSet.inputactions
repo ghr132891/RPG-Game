@@ -112,6 +112,33 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "SwitchNormal",
+                    "type": "Button",
+                    "id": "3bb6d2a7-5377-4d5d-9d44-63ee16ae6fb3",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "SwitchMirror",
+                    "type": "Button",
+                    "id": "ba9ab802-6530-4616-bbbc-5968cff3a4b0",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "SwitchTime",
+                    "type": "Button",
+                    "id": "8f6caaec-0224-4ee5-946b-e3a2681ba0c1",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -244,6 +271,39 @@
                     "processors": "",
                     "groups": ";keyboard & Mouse",
                     "action": "Interact",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "73f34798-c00b-47fd-9bec-7d9e08745142",
+                    "path": "<Keyboard>/1",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";keyboard & Mouse",
+                    "action": "SwitchNormal",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "04cb02ef-6c8c-412f-a3a8-2dccacec1d05",
+                    "path": "<Keyboard>/2",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";keyboard & Mouse",
+                    "action": "SwitchMirror",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4a5bf289-0113-41a2-a2a4-b00894f413e6",
+                    "path": "<Keyboard>/3",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";keyboard & Mouse",
+                    "action": "SwitchTime",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

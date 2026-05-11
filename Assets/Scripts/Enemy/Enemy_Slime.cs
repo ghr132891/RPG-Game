@@ -5,6 +5,7 @@ public class Enemy_Slime : Enemy, ICounterable
     public bool CanBeCountered { get => canBeStunned; }
     public Enemy_SlimeDeadState slimeDeadState { get; set; }
     private Transform targetToChase;
+    [SerializeField] private GameObject platformCollider;
 
     [Header("Slime Specifics")]
     [SerializeField] private GameObject childSlimePrefab;
@@ -31,6 +32,42 @@ public class Enemy_Slime : Enemy, ICounterable
     {
         base.Start();
         stateMachine.Initialize(idleState);
+        SetPlatformCollider(true);
+
+        WorldManager.Instance.OnWorldChanged += HandleWorldChanged;
+    }
+
+    private void HandleWorldChanged(WorldType newWorld)
+    {
+        if (newWorld == WorldType.Mirror)
+        {
+            // 陷入虚弱：关闭物理碰撞（玩家可穿透），改变颜色或播放虚弱动画
+            // 镜像界：关闭跳板，陷入虚弱
+            SetPlatformCollider(false);
+            GetComponent<Collider2D>().isTrigger = true;
+            anim.SetBool("isWeak", true);
+        }
+        else
+        {
+            // 现实界：开启跳板，变硬
+            SetPlatformCollider(true);
+            // 恢复正常
+            GetComponent<Collider2D>().isTrigger = false;
+            anim.SetBool("isWeak", false);
+        }
+    }
+
+    private void SetPlatformCollider(bool value)
+    {
+        if(platformCollider != null)
+            platformCollider.SetActive(value);
+    }
+
+    private void OnDestroy()
+    {
+        // 记得注销事件，防止内存泄漏
+        if (WorldManager.Instance != null)
+            WorldManager.Instance.OnWorldChanged -= HandleWorldChanged;
     }
 
     public override void EntityDeath()

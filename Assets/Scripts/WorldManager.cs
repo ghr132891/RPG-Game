@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using System.Collections;
 
 public class WorldManager : MonoBehaviour
 {
@@ -12,6 +13,9 @@ public class WorldManager : MonoBehaviour
     [Header("时间世界设置")]
     [Range(0.01f, 2f)]
     public float timeWorldScale = 0.3f;
+
+    [Header("滤镜渐变时间")]
+    public float filterFadeDuration = 0.25f;
 
     public WorldType currentWorld = WorldType.Normal;
     public bool isMirrored { get; private set; }
@@ -33,13 +37,19 @@ public class WorldManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha3)) TrySwitchWorld(WorldType.Normal);
-        if (Input.GetKeyDown(KeyCode.Alpha4)) TrySwitchWorld(WorldType.Time);
-        if (Input.GetKeyDown(KeyCode.Alpha5)) TrySwitchWorld(WorldType.Mirror);
+        //if (Input.GetKeyDown(KeyCode.Alpha3)) TrySwitchWorld(WorldType.Normal);
+        //if (Input.GetKeyDown(KeyCode.Alpha4)) TrySwitchWorld(WorldType.Time);
+        //if (Input.GetKeyDown(KeyCode.Alpha5)) TrySwitchWorld(WorldType.Mirror);
 
         // 【新增】：按下 T 键触发时停开关
         if (Input.GetKeyDown(KeyCode.T)) TryToggleTimeStop();
     }
+
+    private UI_WorldFilterScreen FindFilterScreenUI()
+    {
+        return FindFirstObjectByType<UI_WorldFilterScreen>();
+    }
+
     private void TryToggleTimeStop()
     {
         // 只有在时间世界里，才能使用时停功能
@@ -68,6 +78,36 @@ public class WorldManager : MonoBehaviour
         lastSwitchTime = Time.unscaledTime;
         isTimeStopped = false;
 
+        StartCoroutine(SwitchWorldCo(inputType));
+    }
+
+    private IEnumerator SwitchWorldCo(WorldType inputType)
+    {
+        UI_WorldFilterScreen filterScreen = FindFilterScreenUI();
+
+        // --- 视觉表现层：滤镜控制 ---
+        if (filterScreen != null)
+        {
+            // 1. 处理退出逻辑：如果当前是时间/镜像，但新状态不是，则淡出
+            if (currentWorld == WorldType.Time && inputType != WorldType.Time)
+                filterScreen.DoFilterFadeOut(filterFadeDuration);
+            else if (currentWorld == WorldType.Mirror && inputType != WorldType.Mirror)
+                filterScreen.DoFilterFadeOut(filterFadeDuration);
+
+            // 2. 处理进入逻辑
+            if (inputType == WorldType.Time && currentWorld != WorldType.Time)
+                filterScreen.DoTimeFilterFadeIn(0.35f, filterFadeDuration);
+            else if (inputType == WorldType.Mirror && currentWorld != WorldType.Mirror)
+                filterScreen.DoMirrorFilterFadeIn(0.35f, filterFadeDuration);
+
+            // 3. 处理镜像和时间叠加的特殊视觉（可选）
+            // 如果你的逻辑允许同时是镜像+时间，你可以在这里叠加颜色或选择混合色
+        }
+
+        // --- 核心逻辑层：状态修改 (保持你原有的逻辑) ---
+        lastSwitchTime = Time.unscaledTime;
+        isTimeStopped = false;
+
         if (inputType == WorldType.Normal)
         {
             SetNormalWorld();
@@ -75,17 +115,10 @@ public class WorldManager : MonoBehaviour
         else if (inputType == WorldType.Mirror)
         {
             if (currentWorld == WorldType.Mirror)
-            {
                 SetNormalWorld();
-            }
             else
             {
-                // 关闭时间减速
-                Time.timeScale = 1f;
-                Time.fixedDeltaTime = 0.02f;
-                if (Player.instance != null) Player.instance.SetTimeImmunity(false);
-
-                // 强制开启镜像
+                ResetTimeScale(); // 确保镜像界初始时间正常
                 isMirrored = true;
                 currentWorld = WorldType.Mirror;
             }
@@ -94,25 +127,34 @@ public class WorldManager : MonoBehaviour
         {
             if (currentWorld == WorldType.Time)
             {
-                // 关闭时间，根据是否翻转决定退回哪个世界
-                Time.timeScale = 1f;
-                Time.fixedDeltaTime = 0.02f;
-                if (Player.instance != null) Player.instance.SetTimeImmunity(false);
-
+                ResetTimeScale();
                 currentWorld = isMirrored ? WorldType.Mirror : WorldType.Normal;
             }
             else
             {
-                // 进入时间世界
-                Time.timeScale = timeWorldScale;
-                Time.fixedDeltaTime = 0.02f * timeWorldScale;
-                if (Player.instance != null) Player.instance.SetTimeImmunity(true);
-
+                ApplyTimeScale(); // 进入减速状态
                 currentWorld = WorldType.Time;
             }
         }
 
         OnWorldChanged?.Invoke(currentWorld);
+        yield return null;
+    }
+
+    // 辅助方法：重置时间
+    private void ResetTimeScale()
+    {
+        Time.timeScale = 1f;
+        Time.fixedDeltaTime = 0.02f;
+        if (Player.instance != null) Player.instance.SetTimeImmunity(false);
+    }
+
+    // 辅助方法：应用时间减速
+    private void ApplyTimeScale()
+    {
+        Time.timeScale = timeWorldScale;
+        Time.fixedDeltaTime = 0.02f * timeWorldScale;
+        if (Player.instance != null) Player.instance.SetTimeImmunity(true);
     }
 
     private void SetNormalWorld()

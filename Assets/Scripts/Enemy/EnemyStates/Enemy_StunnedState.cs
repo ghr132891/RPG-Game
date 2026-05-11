@@ -16,6 +16,7 @@ public class Enemy_StunnedState : EnemyState
         enemy_VFX.EnableAttackAlert(false);
         enemy.EnableCounterWindow(false);
         stateTimer = enemy.stunnedDuration;
+        // 为了新弹反
         rb.linearVelocity = new Vector2(enemy.stunnedVelocity.x * -enemy.facingDir, enemy.stunnedVelocity.y);
     }
 

@@ -10,6 +10,13 @@ public class Player_AiredState : PlayerState
     {
         base.Update();
 
+        // 【新增】：在空中按下弹反键，直接切换到弹反状态
+        if (input.Player.CounterAttack.WasPressedThisFrame())
+        {
+            stateMachine.ChangeState(player.counterAttackState);
+            return; // 切换状态后直接 return，防止执行下面的移动逻辑
+        }
+
         if (player.wallDetected && rb.linearVelocity.y < 0)
         {
             // 判定条件：当前速度向下，且检测到墙壁
@@ -23,5 +30,4 @@ public class Player_AiredState : PlayerState
         if (input.Player.Attack.WasPressedThisFrame())
             stateMachine.ChangeState(player.jumpAttackState);
     }
-
 }

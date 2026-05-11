@@ -248,10 +248,16 @@ public class Player : Entity
 
         input.Player.Interact.performed += ctx => TryInteract();
 
-        input.Player.QuickItemSlot_1.performed += ctx => inventory.TryUseQuickItemSlot(1);
-        input.Player.QuickItemSlot_2.performed += ctx => inventory.TryUseQuickItemSlot(2);
+        //input.Player.QuickItemSlot_1.performed += ctx => inventory.TryUseQuickItemSlot(1);
+        //input.Player.QuickItemSlot_2.performed += ctx => inventory.TryUseQuickItemSlot(2);
 
-        
+        input.Player.SwitchNormal.performed += ctx => skillManager.normalSwitch.TryUseSkill();
+        input.Player.SwitchMirror.performed += ctx => skillManager.mirrorSwitch.TryUseSkill();
+        input.Player.SwitchTime.performed += ctx => skillManager.timeSwitch.TryUseSkill();
+
+
+
+
     }
 
     private void OnDisable()
