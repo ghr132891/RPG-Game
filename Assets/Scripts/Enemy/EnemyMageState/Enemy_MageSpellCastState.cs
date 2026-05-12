@@ -3,6 +3,8 @@ using UnityEngine;
 public class Enemy_MageSpellCastState : EnemyState
 {
     private Enemy_Mage enemyMage;
+    private bool hasCastFinished;
+    private float waitTimer;
 
     public Enemy_MageSpellCastState(Enemy enemy, StateMachine stateMachine, string animBoolName) : base(enemy, stateMachine, animBoolName)
     {
@@ -12,19 +14,49 @@ public class Enemy_MageSpellCastState : EnemyState
     public override void Enter()
     {
         base.Enter();
-        enemy.SetVelocity(0, 0);
+        enemyMage.SetVelocity(0, 0);
         enemyMage.SetSpellCastPerformed(false);
+        hasCastFinished = false;
+        waitTimer = 0f;
+
+
     }
 
     public override void Update()
     {
         base.Update();
 
-        if (enemyMage.spellCastPerformed)
-            anim.SetBool("spellCast_Performed", true);
+        // 步骤 1：检测协程是否扔完了所有炸弹
+        if (enemyMage.spellCastPerformed && !hasCastFinished)
+        {
 
-        if (triggerCalled)
-            stateMachine.ChangeState(enemy.battleState);
+            hasCastFinished = true;
+
+            anim.SetBool("spellCast_Performed", true);
+            waitTimer = 1.5f;
+        }
+
+        // 步骤 2：倒计时与退出逻辑
+        if (hasCastFinished)
+        {
+            waitTimer -= Time.deltaTime;
+
+            if (waitTimer <= 0)
+            {
+                // 倒计时结束，检查动画是否也播完了
+                if (triggerCalled)
+                {
+
+                    EvaluateParryResult();
+                }
+                else
+                {
+                    // 【终极防卡死】：时间到了但没检测到动画事件！强制退出！
+                    
+                    EvaluateParryResult();
+                }
+            }
+        }
     }
 
     public override void Exit()
@@ -32,7 +64,23 @@ public class Enemy_MageSpellCastState : EnemyState
         base.Exit();
         anim.SetBool("spellCast_Performed", false);
 
-        
     }
 
+    private void EvaluateParryResult()
+    {
+        if (enemyMage.bombsParriedCount >= enemyMage.amountToCast)
+        {
+            IDamagable damagable = enemyMage.GetComponent<IDamagable>();
+            if (damagable != null) damagable.TakeDamage(enemyMage.allParriedBonusDamage, 0, ElementType.None, enemyMage.transform);
+            stateMachine.ChangeState(enemyMage.mageWeakState);
+        }
+        else if (enemyMage.bombsParriedCount > 0)
+        {
+            stateMachine.ChangeState(enemyMage.mageWeakState);
+        }
+        else
+        {
+            stateMachine.ChangeState(enemyMage.mageBattleState);
+        }
+    }
 }

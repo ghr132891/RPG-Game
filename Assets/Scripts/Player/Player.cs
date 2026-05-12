@@ -76,6 +76,11 @@ public class Player : Entity
 
     public Vector2 mousePosition { get; private set; }
 
+    // ===================================
+    // ======= 动作游戏核心：卡肉感 =======
+    // ===================================
+    private Coroutine hitStopCo;
+
     protected override void Awake()
     {
         base.Awake();
@@ -265,5 +270,35 @@ public class Player : Entity
         input.Disable();
     }
 
-   
+    public void TriggerHitStop(float duration)
+    {
+        // 如果当前已经在卡肉了，重新计时（防止连续弹反导致时间错乱）
+        if (hitStopCo != null)
+            StopCoroutine(hitStopCo);
+
+        hitStopCo = StartCoroutine(HitStopRoutine(duration));
+    }
+
+    private System.Collections.IEnumerator HitStopRoutine(float duration)
+    {
+        // 1. 瞬间将时间极大幅度减慢（不要设为绝对的 0，设为 0.05f 可以让粒子特效有一点点动感）
+        Time.timeScale = 0.05f;
+
+        // 2. 极其关键：必须使用 WaitForSecondsRealtime 等待真实的物理时间！
+        // 因为当前的 Time.timeScale 已经快变成 0 了，用普通的 WaitForSeconds 会永远等不到结束。
+        yield return new WaitForSecondsRealtime(duration);
+
+        // 3. 恢复时间。这里完美兼容你的世界切换系统：
+        // 如果当前在时间世界，就恢复到减速状态；否则恢复到 1.0 正常速度。
+        if (WorldManager.Instance != null && WorldManager.Instance.currentWorld == WorldType.Time)
+        {
+            Time.timeScale = WorldManager.Instance.timeWorldScale;
+        }
+        else
+        {
+            Time.timeScale = 1f;
+        }
+    }
+
+
 }

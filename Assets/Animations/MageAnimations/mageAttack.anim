@@ -99,21 +99,21 @@ AnimationClip:
     intParameter: 0
     messageOptions: 0
   - time: 0.33333334
-    functionName: AttckTrigger
+    functionName: CurrentStateTrigger
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
   - time: 0.33333334
-    functionName: DisableCounterWindow
+    functionName: AttckTrigger
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
   - time: 0.5833333
-    functionName: CurrentStateTrigger
+    functionName: DisableCounterWindow
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0

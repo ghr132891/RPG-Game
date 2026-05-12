@@ -140,6 +140,11 @@ public class Enemy : Entity
         Gizmos.DrawLine(playerCheck.position, new Vector3(playerCheck.position.x + (facingDir * minAbleRetreatDistance), playerCheck.position.y));
     }
 
+    // 默认情况下，所有怪物硬直结束后都进入 Idle 状态
+    public virtual void OnStunFinished()
+    {
+        stateMachine.ChangeState(idleState);
+    }
     private void OnEnable()
     {
         Player.OnPlayerDeadth += HandlePlayerDeath;

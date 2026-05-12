@@ -10,7 +10,7 @@ public class Entity : MonoBehaviour
     public Rigidbody2D rb { get; private set; }
     public Entity_SFX entitySFX { get; private set; }
 
-    protected StateMachine stateMachine;
+    public StateMachine stateMachine;
 
     private bool facingRight = true;
     public int facingDir { get; private set; } = 1;

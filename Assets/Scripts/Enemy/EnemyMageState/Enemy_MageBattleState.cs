@@ -1,9 +1,7 @@
-using UnityEngine;
-
 public class Enemy_MageBattleState : Enemy_BattleState
 {
     private Enemy_Mage enemyMage;
-    private float lastTimeUsedRetreat = float.NegativeInfinity;
+    //private float lastTimeUsedRetreat = float.NegativeInfinity;
 
     public Enemy_MageBattleState(Enemy enemy, StateMachine stateMachine, string animBoolName) : base(enemy, stateMachine, animBoolName)
     {
@@ -13,7 +11,7 @@ public class Enemy_MageBattleState : Enemy_BattleState
     public override void Enter()
     {
         base.Enter();
-
+        /*
         if (ShouldRetreat())
         {
             if (CanUseRetreatAbility())
@@ -21,11 +19,15 @@ public class Enemy_MageBattleState : Enemy_BattleState
             else
                 ShortRetreat();
         }
-
-
+        */
 
     }
-    
+    public override void Update()
+    {
+        base.Update();
+    }
+
+    /*
     private void Retreat()
     {
         lastTimeUsedRetreat = Time.time;
@@ -34,5 +36,5 @@ public class Enemy_MageBattleState : Enemy_BattleState
     }
 
     private bool CanUseRetreatAbility() => Time.time > lastTimeUsedRetreat + enemyMage.retreatCoolDown;
-
+    */
 }

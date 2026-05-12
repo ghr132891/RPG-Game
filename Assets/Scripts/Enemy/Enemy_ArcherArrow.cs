@@ -52,6 +52,8 @@ public class Enemy_ArcherArrow : MonoBehaviour, ICounterable
         transform.Rotate(0,180,0);
 
         int enemyLayer = LayerMask.NameToLayer("Enemy");
+        int playerLayer = LayerMask.NameToLayer("Player");
         whatIsTarget |= (1 <<enemyLayer);// whatIsTarget = whatIsTarget | (1 << enemyLayer);
+        whatIsTarget &= ~(1 << playerLayer);
     }
 }
