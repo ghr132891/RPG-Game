@@ -9,6 +9,8 @@ public class Enemy_Mage : Enemy, ICounterable
     public Enemy_MageSpellCastState mageSpellCastState { get; private set; }
     public Enemy_MageWeakState mageWeakState { get; private set; }
 
+    public Enemy_MageDashAttackState mageDashAttackState { get; private set; }
+
     [Header("Mage Specifics")]
     [SerializeField] private GameObject spellPrefab;
     [SerializeField] private Transform spellStartPosition;
@@ -29,6 +31,13 @@ public class Enemy_Mage : Enemy, ICounterable
     [Tooltip("控制每次扔炸弹后的停顿时间。例如填入 0.3, 0.3, 1.0 就是 哒-哒--哒 的节奏")]
     public float[] castRhythm;
 
+    [Header("Dash Attack Settings")]
+    public float dashAttackProbability = 0.3f; // 触发冲刺大斩击的概率 (0.3 = 30%)
+    public float backDashSpeed = 10f;          // 后退时的速度
+    public float backDashDuration = 0.5f;      // 后退持续的时间
+    public float forwardDashSpeed = 15f;       // 向前冲刺斩击的速度
+    public bool isDoingDashAttack;             // 标记当前是否正在执行此技能
+
     [SerializeField] private Transform behindCollsionCheck;
     [SerializeField] private bool hasStunRecoveryAnimation = true;
 
@@ -36,6 +45,8 @@ public class Enemy_Mage : Enemy, ICounterable
     public float retreatCoolDown = 5;
     public float retreatMaxDistance = 8;
     public float retreatSpeed = 15;
+
+
     protected override void Awake()
     {
         base.Awake();
@@ -45,6 +56,7 @@ public class Enemy_Mage : Enemy, ICounterable
         attackState = new Enemy_AttackState(this, stateMachine, "attack");
         deadState = new Enemy_DeadState(this, stateMachine, "idle");
         stunnedState = new Enemy_StunnedState(this, stateMachine, "stunned");
+        mageDashAttackState = new Enemy_MageDashAttackState(this, stateMachine, "dashAttack", this);
 
         mageSpellCastState = new Enemy_MageSpellCastState(this, stateMachine, "spellCast");
         mageRetreatState = new Enemy_MageRetreatState(this, stateMachine, "battle");
@@ -58,8 +70,110 @@ public class Enemy_Mage : Enemy, ICounterable
     protected override void Start()
     {
         base.Start();
+
         stateMachine.Initialize(idleState);
+
+        // 【新增】：在 Start 中订阅世界切换事件
+        if (WorldManager.Instance != null)
+        {
+            WorldManager.Instance.OnWorldChanged += CheckMirrorWorld;
+
+            // 手动调用一次，确保法师刚生成时的无敌状态是正确的
+            CheckMirrorWorld(WorldManager.Instance.currentWorld);
+        }
     }
+
+    private void CheckMirrorWorld(WorldType worldType)
+    {
+        if (worldType == WorldType.Mirror)
+        {
+            // 在镜像世界中：关闭无敌，允许受伤
+            health.SetCanTakeDamage(true);
+
+            // （可选视觉提示）恢复正常颜色
+            GetComponentInChildren<SpriteRenderer>().color = Color.white; 
+        }
+        else
+        {
+            // 在普通世界或时间世界中：开启无敌，免疫攻击
+            health.SetCanTakeDamage(false);
+
+            // （可选视觉提示）变成半透明，提示玩家现在打不到它
+            GetComponentInChildren<SpriteRenderer>().color = new Color(1, 1, 1, 0.5f); 
+        }
+    }
+    protected override void OnDestroy()
+    {
+        base.OnDestroy(); // 调用父类的销毁逻辑（如果父类 Enemy 也有 OnDestroy 的话）
+
+        if (WorldManager.Instance != null)
+        {
+            WorldManager.Instance.OnWorldChanged -= CheckMirrorWorld;
+        }
+    }
+
+    public override void OnStunFinished()
+    {
+        // 【核心修改】：检测是否是在“冲刺斩击”过程中被弹反打断的
+        if (isDoingDashAttack)
+        {
+            isDoingDashAttack = false; // 重置标记
+            currentParryCount = 0;     // (可选) 重置普通弹反次数计数器
+
+            // 直接强行转入撤退扔炸弹状态！
+            stateMachine.ChangeState(mageRetreatState);
+            return;
+        }
+
+        // 原本的逻辑：如果计数器满了
+        if (currentParryCount >= requiredParriesToCast)
+        {
+            currentParryCount = 0; // 重置计数器
+            stateMachine.ChangeState(mageRetreatState);
+        }
+        else
+        {
+            // 如果次数没满，继续近战
+            base.OnStunFinished();
+        }
+    }
+
+    public void ResetDashAttackFlag()
+    {
+        isDoingDashAttack = false;
+    }
+
+    // 给状态机调用的公共方法
+    public void FreezeDuringTimeRewind(Player_TimeRewinder playerRewinder)
+    {
+        StartCoroutine(FreezeMageRoutine(playerRewinder));
+    }
+
+    private IEnumerator FreezeMageRoutine(Player_TimeRewinder playerRewinder)
+    {
+        // 1. 记录被冻结前的状态
+        RigidbodyType2D originalBodyType = rb.bodyType;
+        Vector2 originalVelocity = rb.linearVelocity;
+        float originalAnimSpeed = anim.speed;
+
+        // 2. 暂停法师的行动
+        // 禁用自身脚本，这会停止 Entity.cs 中的 Update()，从而彻底暂停 stateMachine 的运作
+        this.enabled = false;
+        rb.bodyType = RigidbodyType2D.Kinematic;
+        rb.linearVelocity = Vector2.zero;
+        anim.speed = 0;
+
+        // 3. 挂起协程，等待玩家回溯结束
+        yield return new WaitWhile(() => playerRewinder.isRewinding);
+
+        // 4. 回溯结束，恢复法师的行动
+        anim.speed = originalAnimSpeed > 0 ? originalAnimSpeed : 1;
+        rb.bodyType = originalBodyType;
+        rb.linearVelocity = originalVelocity;
+        this.enabled = true; // 重新启用脚本，状态机从暂停的那一帧完美继续
+    }
+
+
 
     //当炸弹被弹反时调用
     public void OnBombParried()
@@ -79,32 +193,27 @@ public class Enemy_Mage : Enemy, ICounterable
 
         for (int i = 0; i < amountToCast; i++)
         {
-            Transform target = player != null ? player : Player.instance.transform;
-
-            Enemy_MageProjectile projectile
-                = Instantiate(spellPrefab, spellStartPosition.position, Quaternion.identity).GetComponent<Enemy_MageProjectile>();
-
-            projectile.SetupProjectile(target, combat);
-
-            // 【核心修改：动态节奏提取】
-            float currentWaitTime = 1f; // 默认保底 1 秒
-
-            // 检查你是否在 Unity 面板里配置了节奏数组
+            // 1. 【核心修复】：先读取节奏时间
+            float waitTime = 1f;
             if (castRhythm != null && castRhythm.Length > 0)
             {
-                // 使用取余符号 (%) 是为了防止越界报错！
-                // 比如你设置了扔 5 个炸弹，但节奏数组只填了 3 个数字，它会循环读取 (0,1,2,0,1)
-                currentWaitTime = castRhythm[i % castRhythm.Length];
+                waitTime = castRhythm[i % castRhythm.Length];
             }
             else
             {
-                // 如果你忘了配置节奏数组，就用你之前的默认冷却时间兜底
-                currentWaitTime = spellCastCooldown;
+                waitTime = spellCastCooldown;
             }
 
-            yield return new WaitForSeconds(currentWaitTime);
+            // 2. 先等待！这相当于法师的“施法前摇”或者两发之间的“攻击间隔”
+            yield return new WaitForSeconds(waitTime);
+
+            // 3. 时间到了，再扔出对应的炸弹！
+            Transform target = player != null ? player : Player.instance.transform;
+            Enemy_MageProjectile projectile = Instantiate(spellPrefab, spellStartPosition.position, Quaternion.identity).GetComponent<Enemy_MageProjectile>();
+            projectile.SetupProjectile(target, combat);
         }
 
+        // 最后一发扔完后，立刻通知状态机，进入那 1.5 秒的弹反等待期
         SetSpellCastPerformed(true);
     }
     public void HandleCounter()
@@ -119,22 +228,7 @@ public class Enemy_Mage : Enemy, ICounterable
         stateMachine.ChangeState(stunnedState);
     }
 
-    public override void OnStunFinished()
-    {
-        // 如果计数器满了
-        if (currentParryCount >= requiredParriesToCast)
-        {
-            currentParryCount = 0; // 重置计数器
 
-            // 拦截原本去 Idle 的路线，强行转入撤退扔炸弹状态！
-            stateMachine.ChangeState(mageRetreatState);
-        }
-        else
-        {
-            // 如果次数没满，就按普通怪物那样，乖乖进入 Idle 继续近战
-            base.OnStunFinished();
-        }
-    }
 
     public bool CanNotMoveBackwards()
     {
@@ -143,6 +237,8 @@ public class Enemy_Mage : Enemy, ICounterable
 
         return noGround || detectedWall;
     }
+
+
     protected override void OnDrawGizmos()
     {
         base.OnDrawGizmos();
@@ -153,4 +249,6 @@ public class Enemy_Mage : Enemy, ICounterable
         Gizmos.DrawLine(behindCollsionCheck.position,
             new Vector3(behindCollsionCheck.position.x, behindCollsionCheck.position.y - 4f));
     }
+
+
 }

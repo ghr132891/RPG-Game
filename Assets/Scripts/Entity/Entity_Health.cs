@@ -63,6 +63,7 @@ public class Entity_Health : MonoBehaviour, IDamagable
         if (isDead || canTakeDamage == false)
             return false;
 
+
         if (AttackEvaded())
         {
             Debug.Log($"{gameObject.name} evaded the attack!");

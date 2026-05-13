@@ -7,10 +7,16 @@ public class Enemy_MageProjectile : MonoBehaviour, ICounterable
     private Collider2D col;
     private Animator anim;
 
+    [Header("Flight Settings")]
     [SerializeField] private float arcHeight = 2f;
     [SerializeField] private LayerMask whatCanCollideWith;
 
+    // 【新增】：速度倍率控制器！数值越小，飞得越慢。
+    [Tooltip("投掷速度倍率：1为原速，0.5为速度减半。数值越小飞得越慢")]
+    [SerializeField][Range(0.1f, 3f)] private float flightSpeedMultiplier = 0.6f;
+
     // === 弹反重写专用变量 ===
+    [Header("Parry Settings")]
     private bool isParried = false;
     private Vector2 parryStartPos;
     private float parryTimer;
@@ -28,7 +34,12 @@ public class Enemy_MageProjectile : MonoBehaviour, ICounterable
         this.combat = combat;
         isParried = false;
 
-        // 法师发射时，依然使用你原本的物理公式
+        // 【关键修改】：要让抛物线变慢，且不改变弧度高度，必须动态降低重力！
+        // 物理学公式：速度变为原来的 N 倍，重力需要变为原来的 N 的平方倍。
+        float baseGravityScale = rb.gravityScale; // 获取预制体原本的重力倍率
+        rb.gravityScale = baseGravityScale * (flightSpeedMultiplier * flightSpeedMultiplier);
+
+        // 法师发射时，基于新的慢速重力，计算出需要的慢速初速度
         Vector2 velocity = CalculateBallisticVelocity(transform.position, target.position);
         rb.linearVelocity = velocity;
     }
@@ -117,14 +128,13 @@ public class Enemy_MageProjectile : MonoBehaviour, ICounterable
     // === 弹反入口 ===
     public void HandleCounter()
     {
-
         if (isParried) return;
 
         isParried = true;
 
         if (combat != null)
         {
-            // 【新增】：通知法师，这个炸弹被成功弹反了！
+            // 通知法师，这个炸弹被成功弹反了！
             Enemy_Mage mage = combat.GetComponent<Enemy_Mage>();
             if (mage != null)
             {
@@ -135,7 +145,7 @@ public class Enemy_MageProjectile : MonoBehaviour, ICounterable
         parryStartPos = transform.position;
         parryTimer = 0f;
 
-        // 【极其关键】：把刚体变成运动学（Kinematic），彻底关闭物理引擎对它的影响！
+        // 把刚体变成运动学（Kinematic），彻底关闭物理引擎对它的影响！
         rb.bodyType = RigidbodyType2D.Kinematic;
         rb.linearVelocity = Vector2.zero;
 

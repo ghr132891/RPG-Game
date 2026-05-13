@@ -13,8 +13,8 @@ public class Entity_Combat : MonoBehaviour
 
 
     [Header("Target Details")]
-    [SerializeField] private Transform targetCheck;
-    [SerializeField] private float targetCheckRadius = 1;
+    [SerializeField] protected Transform targetCheck;
+    [SerializeField] protected float targetCheckRadius = 1;
     [SerializeField] private LayerMask whatIsTarget;
 
     

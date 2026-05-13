@@ -2,6 +2,10 @@ using UnityEngine;
 
 public class Player_Combat : Entity_Combat
 {
+    [Header("Jump Attack Specifics")]
+    public Transform plungeCheck; // 下劈的脚底检测点
+    public float plungeCheckRadius = 0.8f; // 下劈的判定范围
+
     [Header("Counter Attack Details")]
     [SerializeField] private float counterRadius = 2.5f; // 光圈弹反的范围半径
     [SerializeField] private float knockbackForce = 15f; // 对敌人造成的击退力度
@@ -97,6 +101,12 @@ public class Player_Combat : Entity_Combat
     {
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(transform.position, counterRadius);
+
+        if (plungeCheck != null)
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(plungeCheck.position, plungeCheckRadius);
+        }
     }
 
 }

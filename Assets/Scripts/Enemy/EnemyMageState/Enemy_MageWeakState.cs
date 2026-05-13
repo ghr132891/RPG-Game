@@ -65,6 +65,8 @@ public class Enemy_MageWeakState : EnemyState
         if (playerRewinder != null)
         {
             playerRewinder.StartRewind();
+            enemyMage.FreezeDuringTimeRewind(playerRewinder);
+
         }
         else
         {

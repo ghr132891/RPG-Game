@@ -32,6 +32,7 @@ public class Entity : MonoBehaviour
     private Coroutine slowDownCo;
 
 
+
     protected virtual void Awake()
     {
         anim = GetComponentInChildren<Animator>();
@@ -47,7 +48,10 @@ public class Entity : MonoBehaviour
 
     }
 
-
+    protected virtual void OnDestroy()
+    {
+        
+    }
 
 
     protected virtual void Start()

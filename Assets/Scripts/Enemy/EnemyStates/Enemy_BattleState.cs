@@ -55,7 +55,7 @@ public class Enemy_BattleState : EnemyState
         if (WithinAttackRange() && enemy.PlayerDetected() && CanAttack())
         {
             lastTimeAttacked = Time.time;
-            stateMachine.ChangeState(enemy.attackState);
+            ExecuteAttack();
         }
         else
         {
@@ -63,6 +63,12 @@ public class Enemy_BattleState : EnemyState
             enemy.SetVelocity(xVelocity * DirectionToPlayer(), rb.linearVelocity.y);
         }
 
+    }
+
+    protected virtual void ExecuteAttack()
+    {
+        // 默认行为：进入普通近战攻击状态
+        stateMachine.ChangeState(enemy.attackState);
     }
     protected bool CanAttack() => Time.time > lastTimeAttacked + enemy.attackCooldown;
 
