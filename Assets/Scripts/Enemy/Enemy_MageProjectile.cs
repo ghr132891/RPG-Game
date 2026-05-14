@@ -75,7 +75,6 @@ public class Enemy_MageProjectile : MonoBehaviour, ICounterable
             // 当 t >= 1 时，代表精确到达法师身上
             if (t >= 1f)
             {
-                combat.PerformAttackOnTarget(combat.transform);
                 Explode();
             }
         }
@@ -84,7 +83,18 @@ public class Enemy_MageProjectile : MonoBehaviour, ICounterable
     private void OnTriggerEnter2D(Collider2D collision)
     {
         // 弹反状态下，无视一切原有的碰撞判定！全权交由 Update 里的到达判定
-        if (isParried) return;
+        if (isParried)
+        {
+            // 【核心修改】弹反回程途中，如果碰到了玩家，对玩家依然造成伤害！
+            Player player = collision.GetComponent<Player>();
+            if (player != null)
+            {
+                combat.PerformAttackOnTarget(collision.transform);
+                Explode();
+            }
+
+            return;
+        }
 
         if (((1 << collision.gameObject.layer) & whatCanCollideWith) != 0)
         {
@@ -150,7 +160,7 @@ public class Enemy_MageProjectile : MonoBehaviour, ICounterable
         rb.linearVelocity = Vector2.zero;
 
         // 关闭物理碰撞器，防止半路撞墙、撞地提前销毁
-        col.enabled = false;
+        //col.enabled = false;
 
         // 翻转贴图
         transform.Rotate(0, 180, 0);

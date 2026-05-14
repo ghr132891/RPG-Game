@@ -23,8 +23,12 @@ public class Enemy_Mage : Enemy, ICounterable
     public bool spellCastPerformed { get; private set; }
 
     [Header("Bomb Parry Settings")]
+    [Tooltip("至少需要弹反多少个炸弹，法师施法结束后才会进入普通虚弱状态")]
+    public int requiredParriesToWeak = 1;
+    [Tooltip("需要弹反多少个炸弹，才能触发完美弹反（造成额外真实伤害），通常等于 amountToCast")]
+    public int requiredParriesToPerfect = 3;
     public float weakDuration = 5f; // 虚弱状态持续时间
-    public float allParriedBonusDamage = 20f; // 全部弹反时，法师受到的额外惩罚伤害
+    public float allParriedBonusDamage = 1f; // 全部弹反时，法师受到的额外惩罚伤害
     public int bombsParriedCount { get; private set; } // 成功弹反的炸弹计数器
 
     [Header("Spell Rhythm Settings")]
@@ -85,21 +89,26 @@ public class Enemy_Mage : Enemy, ICounterable
 
     private void CheckMirrorWorld(WorldType worldType)
     {
-        if (worldType == WorldType.Mirror)
-        {
-            // 在镜像世界中：关闭无敌，允许受伤
-            health.SetCanTakeDamage(true);
+        // 替换掉原来的逻辑，直接调用统一判定
+        EvaluateVulnerability();
+    }
 
-            // （可选视觉提示）恢复正常颜色
-            GetComponentInChildren<SpriteRenderer>().color = Color.white; 
+    // 【新增】统一管理法师的受击状态与透明度表现
+    public void EvaluateVulnerability()
+    {
+        bool inMirror = WorldManager.Instance != null && WorldManager.Instance.currentWorld == WorldType.Mirror;
+        bool isWeak = stateMachine.currentState == mageWeakState;
+
+        // 核心规则：只有在【镜像世界】且【处于虚弱状态】时，才可以受击
+        if (inMirror && isWeak)
+        {
+            health.SetCanTakeDamage(true);
+            GetComponentInChildren<SpriteRenderer>().color = Color.white;
         }
         else
         {
-            // 在普通世界或时间世界中：开启无敌，免疫攻击
             health.SetCanTakeDamage(false);
-
-            // （可选视觉提示）变成半透明，提示玩家现在打不到它
-            GetComponentInChildren<SpriteRenderer>().color = new Color(1, 1, 1, 0.5f); 
+            GetComponentInChildren<SpriteRenderer>().color = new Color(1, 1, 1, 0.5f);
         }
     }
     protected override void OnDestroy()
@@ -110,6 +119,19 @@ public class Enemy_Mage : Enemy, ICounterable
         {
             WorldManager.Instance.OnWorldChanged -= CheckMirrorWorld;
         }
+    }
+
+    protected override void HandlePlayerDeath()
+    {
+        // 1. 强制停止法师身上所有正在运行的协程（最核心：这会立刻中断 CastSpellCo 扔炸弹的循环）
+        StopAllCoroutines();
+
+        // 2. 重置法师特有的状态标志位，防止下次遇到玩家时状态错乱
+        spellCastPerformed = false;
+        isDoingDashAttack = false;
+
+        // 3. 调用父类的逻辑，将状态机安全地切换回 idleState
+        base.HandlePlayerDeath();
     }
 
     public override void OnStunFinished()
@@ -179,6 +201,22 @@ public class Enemy_Mage : Enemy, ICounterable
     public void OnBombParried()
     {
         bombsParriedCount++;
+
+        if (bombsParriedCount >= requiredParriesToWeak)
+        {
+            StartCoroutine(ParryFlashRoutine());
+        }
+    }
+
+    private IEnumerator ParryFlashRoutine()
+    {
+        SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>();
+        if (sr != null)
+        {
+            sr.color = Color.red; // 闪红光
+            yield return new WaitForSeconds(0.15f);
+            EvaluateVulnerability(); // 闪烁结束后，恢复原本该有的颜色（半透明或正常）
+        }
     }
     public override void SpecialAttack()
     {

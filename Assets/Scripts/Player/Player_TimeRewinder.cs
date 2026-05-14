@@ -2,9 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// 1. 【扩展记录结构】：加入朝向和动画的精准数据
 public struct PlayerPointInTime
 {
     public Vector3 position;
+    public int facingDir;          // 玩家朝向
+    public int animStateHash;      // 当前动画状态的哈希值（是跳跃、攻击还是空闲？）
+    public float animNormalizedTime; // 动画播放到的具体进度（0到1+）
 }
 
 public class Player_TimeRewinder : MonoBehaviour
@@ -14,8 +18,6 @@ public class Player_TimeRewinder : MonoBehaviour
 
     [Header("Rewind Settings")]
     public float recordTime = 5f;
-
-    // 【新增】：倒放过程消耗的真实时间（越小退得越快，但绝对平滑）
     public float rewindPlaybackDuration = 1.5f;
 
     public bool isRewinding { get; private set; }
@@ -33,7 +35,6 @@ public class Player_TimeRewinder : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.I))
             StartRewind();
-
     }
 
     void FixedUpdate()
@@ -44,7 +45,17 @@ public class Player_TimeRewinder : MonoBehaviour
 
     private void Record()
     {
-        pointsInTime.Insert(0, new PlayerPointInTime { position = transform.position });
+        // 2. 【核心获取】：抓取动画器第 0 层的当前状态信息
+        AnimatorStateInfo animState = player.anim.GetCurrentAnimatorStateInfo(0);
+
+        pointsInTime.Insert(0, new PlayerPointInTime
+        {
+            position = transform.position,
+            facingDir = player.facingDir,
+            animStateHash = animState.fullPathHash,
+            animNormalizedTime = animState.normalizedTime
+        });
+
         int maxFrames = Mathf.RoundToInt(recordTime / Time.fixedDeltaTime);
         if (pointsInTime.Count > maxFrames)
         {
@@ -66,56 +77,68 @@ public class Player_TimeRewinder : MonoBehaviour
     {
         isRewinding = true;
 
-        // 1. 冻结状态机与物理
+        // 冻结状态机与物理
         player.enabled = false;
         rb.bodyType = RigidbodyType2D.Kinematic;
         rb.linearVelocity = Vector2.zero;
-        
 
         Collider2D col = GetComponent<Collider2D>();
         if (col != null) col.enabled = false;
 
-        // 2. 【核心修改：丝滑插值倒放】
+        // 3. 【冻结动画】：暂停 Animator 自带的时间流逝，完全由我们手动控制！
+        player.anim.speed = 0f;
+
         float timer = 0f;
         int totalPoints = pointsInTime.Count;
 
-        // 使用普通的 yield return null 配合 Time.deltaTime，让画面刷新率决定顺滑度
         while (timer < rewindPlaybackDuration)
         {
             timer += Time.deltaTime;
 
-            // 计算当前时间进度百分比 (0 到 1)
             float t = Mathf.Clamp01(timer / rewindPlaybackDuration);
-
-            // 根据百分比，映射到记录列表的“虚拟浮点索引”上
             float floatIndex = Mathf.Lerp(0, totalPoints - 1, t);
 
-            // 找到离这个浮点索引最近的两个真实坐标点（A点和B点）
             int indexA = Mathf.FloorToInt(floatIndex);
             int indexB = Mathf.Min(indexA + 1, totalPoints - 1);
 
-            // 计算在A点和B点之间的微小偏移除数
             float fraction = floatIndex - indexA;
 
-            // 使用 Lerp 完美计算出玩家此时应该在的精确平滑位置！
+            // --- 还原物理位置 ---
             Vector3 smoothPosition = Vector3.Lerp(pointsInTime[indexA].position, pointsInTime[indexB].position, fraction);
-
             rb.MovePosition(smoothPosition);
+
+            // --- 4. 还原玩家朝向 ---
+            if (player.facingDir != pointsInTime[indexA].facingDir)
+            {
+                player.Flip(); // 调用 Entity 基类的 Flip 方法来翻转人物
+            }
+
+            // --- 5. 还原全姿态动画！ ---
+            // 强行指定 Animator 播放特定的哈希状态，并精确定位到当时的时间点
+            player.anim.Play(pointsInTime[indexA].animStateHash, 0, pointsInTime[indexA].animNormalizedTime);
 
             yield return null;
         }
 
-        // 3. 精确收尾
+        // 精确收尾
         if (totalPoints > 0)
         {
             rb.MovePosition(pointsInTime[totalPoints - 1].position);
+
+            // 恢复最后时刻的朝向和动画
+            if (player.facingDir != pointsInTime[totalPoints - 1].facingDir) player.Flip();
+            player.anim.Play(pointsInTime[totalPoints - 1].animStateHash, 0, pointsInTime[totalPoints - 1].animNormalizedTime);
         }
 
         pointsInTime.Clear();
 
-        // 4. 恢复控制
+        // 恢复控制与物理
         rb.bodyType = RigidbodyType2D.Dynamic;
         if (col != null) col.enabled = true;
+
+        // 6. 【解冻动画】：恢复正常游戏动画播放速率
+        player.anim.speed = 1f;
+
         player.enabled = true;
         isRewinding = false;
     }

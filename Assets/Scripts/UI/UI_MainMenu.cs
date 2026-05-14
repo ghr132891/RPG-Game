@@ -13,6 +13,11 @@ public class UI_MainMenu : MonoBehaviour
     }
     public void PlayButton()
     {
+        // 1. Õ£÷π÷˜≤Àµ•±≥æ∞“Ù¿÷
+        if (AudioManager.instance != null)
+        {
+            AudioManager.instance.StopBGM();
+        }
         AudioManager.instance.PlayGlobalSFX("button_Click");
         GameManager.instance.ContinuePlay();
     }

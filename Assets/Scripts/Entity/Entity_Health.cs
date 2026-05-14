@@ -31,6 +31,9 @@ public class Entity_Health : MonoBehaviour, IDamagable
     [SerializeField] private float heavyKnockbackDuration = .5f;
     [Header("On Heavy Damage")]
     [SerializeField] private float heavyDamageTreshold = .3f;
+
+    [Header("Invincibility Frames (无敌帧)")]
+    [SerializeField] private float invincibilityDuration = 0.5f; // 受击后无敌0.5秒
     protected virtual void Awake()
     {
         entityVFX = GetComponent<Entity_VFX>();
@@ -70,6 +73,11 @@ public class Entity_Health : MonoBehaviour, IDamagable
             return false;
         }
 
+        //受到伤害后，立即关闭受伤开关（进入无敌状态）
+        canTakeDamage = false;
+
+        Invoke(nameof(ResetCanTakeDamage), invincibilityDuration);
+
         Entity_Stats atttackStats = damageDealer.GetComponent<Entity_Stats>();
         float armorReduction = atttackStats != null ? atttackStats.GetArmorReduction() : 0;
         float armorMitigation = entityStats != null ? entityStats.GetArmorMitigation(armorReduction) : 0;
@@ -92,6 +100,14 @@ public class Entity_Health : MonoBehaviour, IDamagable
 
     public bool SetCanTakeDamage(bool canTakeDamage) => this.canTakeDamage = canTakeDamage;
 
+
+    public void ResetCanTakeDamage()
+    {
+        if (!isDead)
+        {
+            canTakeDamage = true;
+        }
+    }
     private bool AttackEvaded()
     {
         if (entityStats == null)
@@ -199,6 +215,6 @@ public class Entity_Health : MonoBehaviour, IDamagable
             return damage / entityStats.GetMaxHealth() > heavyDamageTreshold;
     }
 
-
+ 
 
 }

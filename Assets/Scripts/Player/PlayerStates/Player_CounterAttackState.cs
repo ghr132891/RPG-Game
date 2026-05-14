@@ -63,6 +63,11 @@ public class Player_CounterAttackState : PlayerState
                 // 触发 0.15 秒的超级卡肉！
                 player.TriggerHitStop(0.15f);
 
+                // 【新增核心防御】：弹反成功后，强行关闭玩家的受伤开关，赋予 0.5 秒无敌时间！
+                // 这样就算敌人的武器还没收回去，也不会在弹反结束后立刻打伤你。
+                player.health.SetCanTakeDamage(false);
+                player.health.Invoke("ResetCanTakeDamage", 0.1f);
+
                 // 【新增】：播放弹反音效
                 if (AudioManager.instance != null)
                     AudioManager.instance.PlayGlobalSFX(parrySoundName);
@@ -74,6 +79,16 @@ public class Player_CounterAttackState : PlayerState
 
         if (stateTimer < 0 && counterSomeone == false)
             stateMachine.ChangeState(player.idleState);
+    }
+
+    // 【新增】：公开一个方法供 Health 系统查询，当前是否处于“有效弹反保护期”
+    public bool IsInParryWindow()
+    {
+        // 计算当前处于该状态的时间
+        float timePassed = combat.GetCounterRecoveryDuration() - stateTimer;
+
+        // 如果已经弹反成功，或者还在判定窗口(parryWindow)内，都算作有效保护期
+        return counterSomeone || timePassed <= parryWindow;
     }
 }
 

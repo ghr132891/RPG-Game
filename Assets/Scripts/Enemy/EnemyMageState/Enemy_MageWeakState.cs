@@ -19,6 +19,8 @@ public class Enemy_MageWeakState : EnemyState
         hasTriggeredRewind = false; // 重置锁
 
         enemyMage.vfx.DoImageEchoEffect(1f);
+        // 【新增】进入虚弱状态时，重新评估是否可以受击（结合镜像世界判断）
+        enemyMage.EvaluateVulnerability();
     }
 
     public override void Update()
@@ -53,6 +55,9 @@ public class Enemy_MageWeakState : EnemyState
             hasTriggeredRewind = true;
             TriggerTimeRewind();
         }
+
+        // 【新增】退出虚弱状态时，重新评估（恢复无敌状态）
+        enemyMage.EvaluateVulnerability();
     }
 
     private void TriggerTimeRewind()

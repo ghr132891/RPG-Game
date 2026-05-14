@@ -68,13 +68,17 @@ public class Enemy_MageSpellCastState : EnemyState
 
     private void EvaluateParryResult()
     {
-        if (enemyMage.bombsParriedCount >= enemyMage.amountToCast)
+        if (enemyMage.bombsParriedCount >= enemyMage.requiredParriesToPerfect)
         {
+            // 【核心修改】完美弹反造成的伤害依然生效：临时强制赋予受击权限
+            enemyMage.health.SetCanTakeDamage(true);
+
             IDamagable damagable = enemyMage.GetComponent<IDamagable>();
             if (damagable != null) damagable.TakeDamage(enemyMage.allParriedBonusDamage, 0, ElementType.None, enemyMage.transform);
+
             stateMachine.ChangeState(enemyMage.mageWeakState);
         }
-        else if (enemyMage.bombsParriedCount > 0)
+        else if (enemyMage.bombsParriedCount >= enemyMage.requiredParriesToWeak)
         {
             stateMachine.ChangeState(enemyMage.mageWeakState);
         }

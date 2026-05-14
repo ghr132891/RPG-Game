@@ -80,7 +80,7 @@ public class Enemy : Entity
 
     }
     public void EnableCounterWindow(bool enable) => canBeStunned = enable;
-    private void HandlePlayerDeath()
+    protected virtual void HandlePlayerDeath()
     {
         stateMachine.ChangeState(idleState);
     }

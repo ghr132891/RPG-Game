@@ -59,6 +59,16 @@ public class Player_Combat : Entity_Combat
             Player player = GetComponent<Player>();
             Rigidbody2D playerRb = GetComponent<Rigidbody2D>();
 
+            // ========================================================
+            // 【第二层绝对防御】：弹反成功后，强行赋予玩家 0.1秒的无敌帧！
+            // 彻底解决弹反动作结束后，敌人武器还停留在身上导致的“二次受伤”。
+            // ========================================================
+            if (player != null && player.health != null)
+            {
+                player.health.SetCanTakeDamage(false); // 强行关闭受伤开关
+                player.health.Invoke(nameof(player.health.ResetCanTakeDamage), 0.1f); // 0.5秒后恢复
+            }
+
             // 只有在空中（脚下没有检测到地面）时，才给自己施加反冲力
             if (player != null && playerRb != null && !player.groundDetected)
             {
