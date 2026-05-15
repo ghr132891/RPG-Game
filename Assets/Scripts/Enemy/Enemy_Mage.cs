@@ -13,6 +13,8 @@ public class Enemy_Mage : Enemy, ICounterable
 
     [Header("Mage Specifics")]
     [SerializeField] private GameObject spellPrefab;
+    // 【新增】：用于存放单次发射炸弹时的独立特效（如魔法阵闪烁、能量爆裂）
+    [SerializeField] private GameObject spellCastVFXPrefab;
     [SerializeField] private Transform spellStartPosition;
     public int amountToCast = 3;
     [SerializeField] private float spellCastCooldown = .3f;
@@ -29,6 +31,7 @@ public class Enemy_Mage : Enemy, ICounterable
     public int requiredParriesToPerfect = 3;
     public float weakDuration = 5f; // 虚弱状态持续时间
     public float allParriedBonusDamage = 1f; // 全部弹反时，法师受到的额外惩罚伤害
+    public int parriedBombsReturnedCount { get; private set; } // 已经飞回到法师身上的炸弹计数器
     public int bombsParriedCount { get; private set; } // 成功弹反的炸弹计数器
 
     [Header("Spell Rhythm Settings")]
@@ -58,7 +61,7 @@ public class Enemy_Mage : Enemy, ICounterable
         idleState = new Enemy_IdleState(this, stateMachine, "idle");
         moveState = new Enemy_MoveState(this, stateMachine, "move");
         attackState = new Enemy_AttackState(this, stateMachine, "attack");
-        deadState = new Enemy_DeadState(this, stateMachine, "idle");
+        deadState = new Enemy_DeadState(this, stateMachine, "dead");
         stunnedState = new Enemy_StunnedState(this, stateMachine, "stunned");
         mageDashAttackState = new Enemy_MageDashAttackState(this, stateMachine, "dashAttack", this);
 
@@ -208,6 +211,26 @@ public class Enemy_Mage : Enemy, ICounterable
         }
     }
 
+    // 【新增】：当被弹反的炸弹飞回到法师身上时调用
+    public void OnParriedBombHit()
+    {
+        parriedBombsReturnedCount++;
+
+        // 如果飞回来的炸弹数量，等于我们成功弹反的数量，说明这是最后一颗！
+        // 并且如果总弹反数满足了完美弹反的要求，就在此刻结算真实伤害！
+        if (parriedBombsReturnedCount == bombsParriedCount && bombsParriedCount >= requiredParriesToPerfect)
+        {
+            // 临时强制赋予受击权限
+            health.SetCanTakeDamage(true);
+
+            IDamagable damagable = GetComponent<IDamagable>();
+            if (damagable != null)
+            {
+                damagable.TakeDamage(allParriedBonusDamage, 0, ElementType.None, transform);
+            }
+        }
+    }
+
     private IEnumerator ParryFlashRoutine()
     {
         SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>();
@@ -228,6 +251,7 @@ public class Enemy_Mage : Enemy, ICounterable
     private IEnumerator CastSpellCo()
     {
         bombsParriedCount = 0;
+        parriedBombsReturnedCount = 0; // 【新增】每次扔炸弹前清零
 
         for (int i = 0; i < amountToCast; i++)
         {
@@ -244,6 +268,21 @@ public class Enemy_Mage : Enemy, ICounterable
 
             // 2. 先等待！这相当于法师的“施法前摇”或者两发之间的“攻击间隔”
             yield return new WaitForSeconds(waitTime);
+
+            if (spellCastVFXPrefab != null)
+            {
+                // 在法杖顶端（或发球点）生成特效
+                GameObject vfx = Instantiate(spellCastVFXPrefab, transform.position, Quaternion.identity);
+                // 如果法师朝左（facingDir 为 -1），就让特效也跟着水平翻转
+                if (facingDir == -1)
+                {
+                    vfx.transform.Rotate(0, 180, 0);
+                }
+
+                // 为了防止内存泄漏，确保特效能在播放完毕后自动销毁
+                // （假设特效持续 1 秒，如果你的特效本身自带销毁脚本，可以删除这行）
+                Destroy(vfx, 1f);
+            }
 
             // 3. 时间到了，再扔出对应的炸弹！
             Transform target = player != null ? player : Player.instance.transform;
@@ -276,6 +315,29 @@ public class Enemy_Mage : Enemy, ICounterable
         return noGround || detectedWall;
     }
 
+    public override void EntityDeath()
+    {
+        base.EntityDeath();
+        StopAllCoroutines();
+
+        rb.bodyType = RigidbodyType2D.Kinematic;
+        rb.linearVelocity = Vector2.zero;
+
+        Collider2D collider = GetComponent<Collider2D>();
+        if (collider != null)
+        {
+            collider.enabled = false;
+        }
+
+        GetComponentInChildren<SpriteRenderer>().color = Color.white;
+
+        // 【最核心的修复】：手动强制状态机切换到死亡状态！
+        // 只有进入了这个状态，代码才会执行 anim.SetBool("dead", true) 去触发动画
+        if (deadState != null)
+        {
+            stateMachine.ChangeState(deadState);
+        }
+    }
 
     protected override void OnDrawGizmos()
     {
@@ -287,6 +349,7 @@ public class Enemy_Mage : Enemy, ICounterable
         Gizmos.DrawLine(behindCollsionCheck.position,
             new Vector3(behindCollsionCheck.position.x, behindCollsionCheck.position.y - 4f));
     }
+
 
 
 }

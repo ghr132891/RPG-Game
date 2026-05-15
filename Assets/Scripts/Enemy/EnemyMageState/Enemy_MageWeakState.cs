@@ -4,7 +4,7 @@ public class Enemy_MageWeakState : EnemyState
 {
     private Enemy_Mage enemyMage;
     private float initialHealth;
-    private bool hasTriggeredRewind; // 【新增】防止重复触发的锁
+    private bool hasTriggeredRewind;
 
     public Enemy_MageWeakState(Enemy enemy, StateMachine stateMachine, string animBoolName) : base(enemy, stateMachine, animBoolName)
     {
@@ -16,10 +16,9 @@ public class Enemy_MageWeakState : EnemyState
         base.Enter();
         stateTimer = enemyMage.weakDuration;
         initialHealth = enemyMage.health.GetCurrentHealth();
-        hasTriggeredRewind = false; // 重置锁
+        hasTriggeredRewind = false;
 
         enemyMage.vfx.DoImageEchoEffect(1f);
-        // 【新增】进入虚弱状态时，重新评估是否可以受击（结合镜像世界判断）
         enemyMage.EvaluateVulnerability();
     }
 
@@ -27,7 +26,9 @@ public class Enemy_MageWeakState : EnemyState
     {
         base.Update();
 
-        // 常规检测：如果某些持续伤害没有打断状态，这里依然能正常捕捉
+        if (enemyMage.health.isDead) return;
+
+        // 受到伤害打断
         if (!hasTriggeredRewind && enemyMage.health.GetCurrentHealth() < initialHealth)
         {
             hasTriggeredRewind = true;
@@ -36,7 +37,7 @@ public class Enemy_MageWeakState : EnemyState
             return;
         }
 
-        // 时间结束自然退出
+        // 时间结束自然醒来
         if (stateTimer < 0)
         {
             stateMachine.ChangeState(enemyMage.mageBattleState);
@@ -45,18 +46,32 @@ public class Enemy_MageWeakState : EnemyState
 
     public override void Exit()
     {
-        base.Exit();
+        // ==========================================
+        // 【终极视觉防卡死】：临时关闭 Animator 的恢复动画分支
+        // 防止状态机已经切到了战斗，但动画器却拐进 "虚弱回复" 动画里卡死出不来！
+        // ==========================================
+        bool originalRecovery = enemyMage.anim.GetBool("hasStunRecovery");
+        enemyMage.anim.SetBool("hasStunRecovery", false);
+
+        base.Exit(); // 内部会将 "stunned" 设为 false。此时 Animator 会直接跳过回复动画，秒切回基础动作
+
+        // 恢复参数，以免影响后续正常的眩晕逻辑
+        enemyMage.anim.SetBool("hasStunRecovery", originalRecovery);
+
         enemyMage.vfx.StopImageEchoEffect();
 
-        // 【核心机制：退出兜底拦截】
-        // 如果状态是被底层的受击逻辑“强行打断”的，这里依然能抓到血量下降的铁证！
+        if (enemyMage.health.isDead)
+        {
+            return;
+        }
+
+        // 兜底检测
         if (!hasTriggeredRewind && enemyMage.health.GetCurrentHealth() < initialHealth)
         {
             hasTriggeredRewind = true;
             TriggerTimeRewind();
         }
 
-        // 【新增】退出虚弱状态时，重新评估（恢复无敌状态）
         enemyMage.EvaluateVulnerability();
     }
 
@@ -64,14 +79,12 @@ public class Enemy_MageWeakState : EnemyState
     {
         Debug.Log("<color=red>法师受到攻击，触发时间回退！玩家回到 5 秒前！</color>");
 
-        // 全图搜索，绝对能启动玩家的回溯组件！
         Player_TimeRewinder playerRewinder = UnityEngine.Object.FindAnyObjectByType<Player_TimeRewinder>();
 
         if (playerRewinder != null)
         {
             playerRewinder.StartRewind();
             enemyMage.FreezeDuringTimeRewind(playerRewinder);
-
         }
         else
         {

@@ -28,4 +28,13 @@ public class Enemy_AnimationTriggers : Entity_AnimationTriggers
         enemy_VFX.EnableAttackAlert(false);
         enemy.EnableCounterWindow(false);
     }
+
+    private void SelfDestroyTrigger()
+    {
+        // 销毁整个怪物（父物体）
+        if (enemy != null)
+        {
+            Destroy(enemy.gameObject);
+        }
+    }
 }

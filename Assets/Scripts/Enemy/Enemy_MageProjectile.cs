@@ -75,6 +75,15 @@ public class Enemy_MageProjectile : MonoBehaviour, ICounterable
             // 当 t >= 1 时，代表精确到达法师身上
             if (t >= 1f)
             {
+
+                if (combat != null)
+                {
+                    Enemy_Mage mage = combat.GetComponent<Enemy_Mage>();
+                    if (mage != null)
+                    {
+                        mage.OnParriedBombHit();
+                    }
+                }
                 Explode();
             }
         }

@@ -45,9 +45,9 @@ public class WorldManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.T)) TryToggleTimeStop();
     }
 
-    private UI_WorldFilterScreen FindFilterScreenUI()
+    private WorldFilterManager FindFilterScreenUI()
     {
-        return FindFirstObjectByType<UI_WorldFilterScreen>();
+        return FindFirstObjectByType<WorldFilterManager>();
     }
 
     private void TryToggleTimeStop()
@@ -83,8 +83,9 @@ public class WorldManager : MonoBehaviour
 
     private IEnumerator SwitchWorldCo(WorldType inputType)
     {
-        UI_WorldFilterScreen filterScreen = FindFilterScreenUI();
+        WorldFilterManager filterScreen = FindFilterScreenUI();
 
+        /*
         // --- 视觉表现层：滤镜控制 ---
         if (filterScreen != null)
         {
@@ -103,6 +104,7 @@ public class WorldManager : MonoBehaviour
             // 3. 处理镜像和时间叠加的特殊视觉（可选）
             // 如果你的逻辑允许同时是镜像+时间，你可以在这里叠加颜色或选择混合色
         }
+        */
 
         // --- 核心逻辑层：状态修改 (保持你原有的逻辑) ---
         lastSwitchTime = Time.unscaledTime;

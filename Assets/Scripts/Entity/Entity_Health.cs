@@ -181,13 +181,22 @@ public class Entity_Health : MonoBehaviour, IDamagable
 
     private void UpdateHealthBar()
     {
-        if (healthBar == null && healthBar.transform.parent.gameObject.activeSelf == false)
+        // 修复：使用 || 避免 healthBar 为空时引发的 NullReferenceException
+        // 同时确保父物体不为空时才去判断 activeSelf
+        if (healthBar == null || (healthBar.transform.parent != null && !healthBar.transform.parent.gameObject.activeSelf))
             return;
 
         healthBar.value = currentHealth / entityStats.GetMaxHealth();
     }
 
-    public void EnableHealthBar(bool enable) => healthBar?.transform.parent.gameObject.SetActive(enable); 
+    // 增加空引用保护，防止部分实体没有配置血条 UI 却调用了此方法
+    public void EnableHealthBar(bool enable)
+    {
+        if (healthBar != null && healthBar.transform.parent != null)
+        {
+            healthBar.transform.parent.gameObject.SetActive(enable);
+        }
+    } 
 
     private void TakeKnockback(Transform damageDealer, float finalDamage)
     {
