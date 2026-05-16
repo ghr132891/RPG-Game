@@ -80,6 +80,8 @@ public class Player : Entity
     // ======= 动作游戏核心：卡肉感 =======
     // ===================================
     private Coroutine hitStopCo;
+    // 【新增】：用于告诉外界（比如风场），我正在放重砸技能！
+    public bool isPlunging;
 
     protected override void Awake()
     {
@@ -137,6 +139,12 @@ public class Player : Entity
     {
 
         moveInput = rawMoveInput;
+        // ==========================================
+        // 【核心修复】：把输入的向量值，拆解同步给 xInput 和 yInput！
+        // 只有这样，你的 Player_MoveState 和物理速度更新方法才能抓到真实的键盘输入
+        // ==========================================
+        xInput = moveInput.x;
+        yInput = moveInput.y;
 
 
     }

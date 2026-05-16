@@ -111,6 +111,7 @@ public class Player_Combat : Entity_Combat
     {
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(transform.position, counterRadius);
+        Gizmos.DrawWireSphere(targetCheck.position, targetCheckRadius);
 
         if (plungeCheck != null)
         {

@@ -44,7 +44,7 @@ public class Enemy_ArcherArrow : MonoBehaviour, ICounterable
 
         transform.parent = target;
 
-        Destroy(gameObject, 3);
+        Destroy(gameObject, 2);
     }
     public void HandleCounter()
     {

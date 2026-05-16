@@ -13,6 +13,8 @@ public class Player_JumpAttackState : PlayerState
     public override void Enter()
     {
         base.Enter();
+        // 进入下落攻击时，开启霸体标志
+        player.isPlunging = true;
         touchedGround = false;
 
         player.SetVelocity(player.GetJumpAttackVelocity().x * player.facingDir,player.GetJumpAttackVelocity().y);
@@ -54,5 +56,10 @@ public class Player_JumpAttackState : PlayerState
 
     }
 
-
+    public override void Exit()
+    {
+        base.Exit();
+        // 砸到地面退出状态时，关闭标志
+        player.isPlunging = false;
+    }
 }

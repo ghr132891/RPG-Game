@@ -19,8 +19,8 @@ public class Entity : MonoBehaviour
     public LayerMask whatIsGround;
     [SerializeField] private float groundCheckDistance;
     [SerializeField] private float wallCheckDistance;
-    [SerializeField] private Transform groundCheck;
-    [SerializeField] private Transform primaryWallCheck;
+    [SerializeField] public Transform groundCheck;
+    [SerializeField] public Transform primaryWallCheck;
     [SerializeField] private Transform secondaryWallCheck;
 
     public bool groundDetected { get; private set; }

@@ -18,7 +18,7 @@ public class Enemy_Archer : Enemy
         idleState = new Enemy_IdleState(this, stateMachine, "idle");
         moveState = new Enemy_MoveState(this, stateMachine, "move");
         attackState = new Enemy_AttackState(this, stateMachine, "attack");
-        deadState = new Enemy_DeadState(this, stateMachine, "idle");
+        deadState = new Enemy_DeadState(this, stateMachine, "dead");
         stunnedState = new Enemy_StunnedState(this, stateMachine, "stunned");
 
         archerBattleState = new Enemy_ArcherBattleState(this, stateMachine, "battle");
@@ -41,6 +41,11 @@ public class Enemy_Archer : Enemy
     {
         if (CanBeCountered == false)
             return;
+        // 【新增】：触发瞬间白光
+        if (vfx is Enemy_VFX enemyVfx)
+        {
+            enemyVfx.PlayParryFlash();
+        }
 
         stateMachine.ChangeState(stunnedState);
     }

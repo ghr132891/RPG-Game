@@ -12,7 +12,7 @@ public class Enemy_Skeleton : Enemy,ICounterable
         moveState = new Enemy_MoveState(this,stateMachine,"move");
         attackState = new Enemy_AttackState(this,stateMachine,"attack");
         battleState = new Enemy_BattleState(this,stateMachine,"battle");
-        deadState = new Enemy_DeadState(this,stateMachine,"idle");
+        deadState = new Enemy_DeadState(this,stateMachine,"dead");
         stunnedState = new Enemy_StunnedState(this,stateMachine,"stunned");
     }
 
@@ -25,8 +25,13 @@ public class Enemy_Skeleton : Enemy,ICounterable
     public void HandleCounter()
     {
         if(CanBeCountered == false)
-            return; 
+            return;
 
+        // 【新增】：触发瞬间白光
+        if (vfx is Enemy_VFX enemyVfx)
+        {
+            enemyVfx.PlayParryFlash();
+        }
         stateMachine.ChangeState(stunnedState);
     }
 

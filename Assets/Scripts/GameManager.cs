@@ -28,9 +28,9 @@ public class GameManager : MonoBehaviour,ISaveable
     public void ContinuePlay()
     {
         if (string.IsNullOrEmpty(lastScenePlayed))
-            lastScenePlayed = "Level_0";
+            lastScenePlayed = "Level_Game_train";
         if (SaveManager.instance.GetGameData() == null)
-            lastScenePlayed = "Level_0";
+            lastScenePlayed = "Level_Game_train";
             
         ChangeScene(lastScenePlayed, RespawnType.NoneSpecific);
     }
