@@ -13,6 +13,10 @@ public class Enemy_Slime : Enemy, ICounterable
 
     [SerializeField] private bool hasStunRecoveryAnimation = true;
 
+
+    // 【新增区域】：尖刺卡住机制
+    public bool isStuckOnSpike { get; private set; }
+
     protected override void Awake()
     {
         base.Awake();
@@ -35,6 +39,50 @@ public class Enemy_Slime : Enemy, ICounterable
         SetPlatformCollider(true);
 
         WorldManager.Instance.OnWorldChanged += HandleWorldChanged;
+
+        // 【新增修复】：防止左脚踩右脚！强制忽略史莱姆主身体和跳板之间的物理碰撞！
+        Collider2D mainCol = GetComponent<Collider2D>();
+        Collider2D platformCol = platformCollider.GetComponent<Collider2D>();
+        if (mainCol != null && platformCol != null)
+        {
+            Physics2D.IgnoreCollision(mainCol, platformCol, true);
+        }
+    }
+
+    protected override void Update()
+    {
+        base.Update();
+
+        // 【最核心逻辑】：每一帧都在监视！
+        // 如果它正卡在尖刺上，且试图因为各种原因（比如玩家靠近）切入移动或战斗状态
+        // 我们强行把它按回 idleState，这样它就会像个石头一样一动不动！
+        if (isStuckOnSpike && stateMachine.currentState != slimeDeadState && stateMachine.currentState != idleState)
+        {
+            stateMachine.ChangeState(idleState);
+        }
+    }
+
+    public void GetStuckOnSpike()
+    {
+        isStuckOnSpike = true;
+
+        // 1. 强行将 X 轴速度清零防止滑行，保留 Y 轴让它能自然落地
+        Rigidbody2D rb = GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+        }
+
+        // 2. 只要它还没死，就强行让它切回 Idle 状态
+        if (stateMachine.currentState != slimeDeadState)
+        {
+            stateMachine.ChangeState(idleState);
+        }
+    }
+
+    public void UnstuckFromSpike()
+    {
+        isStuckOnSpike = false;
     }
 
     private void HandleWorldChanged(WorldType newWorld)
@@ -63,8 +111,9 @@ public class Enemy_Slime : Enemy, ICounterable
             platformCollider.SetActive(value);
     }
 
-    private void OnDestroy()
+    protected override void OnDestroy()
     {
+        base.OnDestroy();
         // 记得注销事件，防止内存泄漏
         if (WorldManager.Instance != null)
             WorldManager.Instance.OnWorldChanged -= HandleWorldChanged;

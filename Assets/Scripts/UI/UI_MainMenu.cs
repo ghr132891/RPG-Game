@@ -1,49 +1,64 @@
+using System.Collections;
 using UnityEngine;
-using UnityEngine.UI; // 引入 UI 命名空间
+using UnityEngine.UI;
 
 public class UI_MainMenu : MonoBehaviour
 {
-    [Header("转场控制器")]
-    public UI_GameStartTransition transitionController; // 在面板里把刚才挂脚本的物体拖进来
+    [Header("流程引用")]
+    public UI_GameStartTransition transitionController;
+    public UI_StoryIntro storyController;
 
     private void Start()
     {
         transform.root.GetComponentInChildren<UI_Options>(true).LoadUpVolume();
-        transform.root.GetComponentInChildren<UI_FadeScreen>().DoFadeIn();
+
+        UI_FadeScreen fade = transform.root.GetComponentInChildren<UI_FadeScreen>(true);
+        if (fade != null)
+        {
+            fade.gameObject.SetActive(true);
+            fade.DoFadeIn();
+        }
+
         AudioManager.instance.StartBGM("playList_MainMenu");
     }
 
     public void PlayButton()
     {
-        // 1. 禁用所有按钮交互，防止玩家狂点报错
-        CanvasGroup canvasGroup = GetComponent<CanvasGroup>();
-        if (canvasGroup != null) canvasGroup.interactable = false;
+        // 【核心修复 1】：最简单暴力的隐藏法！直接把主菜单物体关掉。
+        // 因为转场面板和剧情面板与它是兄弟层级，所以关掉它绝对不会影响后续动画！
+        gameObject.SetActive(false);
 
-        // 2. 停止主菜单背景音乐和播放音效
         if (AudioManager.instance != null)
         {
             AudioManager.instance.StopBGM();
             AudioManager.instance.PlayGlobalSFX("button_Click");
-
-            // 你甚至可以在这里播放一声极具气势的转场音效
-            // AudioManager.instance.PlayGlobalSFX("GameStart_Transition"); 
         }
 
-        // 3. 开始优雅的转场表演
+        // 开始流水线：转场 -> 剧情 -> 呼叫 GameManager 切场景
         if (transitionController != null)
         {
-            // 使用 Lambda 表达式，当转场结束时，自动执行大括号里的逻辑
             transitionController.PlayTransition(() =>
             {
-                GameManager.instance.ContinuePlay(); // 表演结束，加载游戏场景！
+                if (storyController != null)
+                {
+                    storyController.StartStory(() =>
+                    {
+                        GameManager.instance.ContinuePlay();
+                    });
+                }
+                else
+                {
+                    GameManager.instance.ContinuePlay();
+                }
             });
         }
         else
         {
-            // 防呆设计：如果没配置转场控制器，直接加载游戏
             GameManager.instance.ContinuePlay();
         }
     }
+
+
 
     public void QuitGameButton()
     {

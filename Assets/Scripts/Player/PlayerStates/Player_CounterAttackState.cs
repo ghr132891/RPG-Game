@@ -6,7 +6,7 @@ public class Player_CounterAttackState : PlayerState
     private bool counterSomeone;
 
     // 【新增】配置弹反的有效判定时间（比如 0.2 秒）
-    private float parryWindow = 0.3f;
+    private float parryWindow = 0.2f;
 
     // 你可以在这里定义弹反音效在 AudioDataBase 中的名字
     private string parrySoundName = "PlayerParry";
@@ -23,12 +23,17 @@ public class Player_CounterAttackState : PlayerState
         counterSomeone = combat.CounterAttackPerformed();
 
         anim.SetBool("counterAttackPerformed", counterSomeone);
+        // 【新增】：一进入弹反状态，立刻开始计算冷却！(防止玩家连续狂按)
+        player.StartCounterCooldown();
 
         // 如果第一帧就弹反成功了，直接卡肉并播放音效
         if (counterSomeone)
         {
             // 停顿 0.15 秒，这个数值是“清脆手感”的黄金时间
             player.TriggerHitStop(0.15f);
+
+            // 【新增奖励】：完美弹反立刻重置CD！
+            player.ResetCounterCooldown();
 
             // 【新增】：播放弹反音效
             if (AudioManager.instance != null)
@@ -67,6 +72,9 @@ public class Player_CounterAttackState : PlayerState
                 // 这样就算敌人的武器还没收回去，也不会在弹反结束后立刻打伤你。
                 player.health.SetCanTakeDamage(false);
                 player.health.Invoke("ResetCanTakeDamage", 0.1f);
+
+                // 【新增奖励】：在有效窗口内弹反成功，立刻重置CD！
+                player.ResetCounterCooldown();
 
                 // 【新增】：播放弹反音效
                 if (AudioManager.instance != null)

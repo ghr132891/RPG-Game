@@ -14,7 +14,7 @@ public class Player_Combat : Entity_Combat
     [SerializeField] private float selfPushForce = 12f;  // 弹反成功后，玩家自身的反冲力大小
     [SerializeField] private float minUpwardBoost = 3f;  // 无论往哪边反冲，都给一点向上的力，提升手感
 
-    [SerializeField] private float counterRecovery = .2f;
+    [SerializeField] private float counterRecovery = .1f;
     [SerializeField] private LayerMask whatisCounterable;
 
     public bool CounterAttackPerformed()

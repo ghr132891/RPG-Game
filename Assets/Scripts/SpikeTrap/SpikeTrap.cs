@@ -40,7 +40,17 @@ public class SpikeTrap : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // 刚进入地刺范围时，加入列表，并立刻尝试造成一次伤害
+        // 1. 【新增逻辑】：专属判定！如果是史莱姆踩上去了
+        Enemy_Slime slime = collision.GetComponent<Enemy_Slime>();
+        if (slime != null)
+        {
+            // 让史莱姆卡住，然后直接 return 结束方法！
+            // 这样它就不会被加入 targetsInTrap 列表，完美免疫地刺伤害！
+            slime.GetStuckOnSpike();
+            return;
+        }
+
+        // 2. 原本的逻辑：对玩家和其他怪物造成伤害
         if (!targetsInTrap.Contains(collision))
         {
             targetsInTrap.Add(collision);
@@ -50,12 +60,19 @@ public class SpikeTrap : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        // 离开地刺范围时，从列表中移除
+        // 【新增逻辑】：如果史莱姆被击飞或者离开了尖刺，解除卡住状态
+        Enemy_Slime slime = collision.GetComponent<Enemy_Slime>();
+        if (slime != null)
+        {
+            slime.UnstuckFromSpike();
+            return;
+        }
+
+        // 原本的逻辑
         if (targetsInTrap.Contains(collision))
         {
             targetsInTrap.Remove(collision);
 
-            // 可选：清除这个目标的冷却记录，让它下次踩上来时立刻受到伤害
             IDamagable damagableTarget = collision.GetComponent<IDamagable>();
             if (damagableTarget != null && targetLastDamageTimes.ContainsKey(damagableTarget))
             {

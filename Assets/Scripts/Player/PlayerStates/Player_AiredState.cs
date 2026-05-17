@@ -11,7 +11,7 @@ public class Player_AiredState : PlayerState
         base.Update();
 
         // 【新增】：在空中按下弹反键，直接切换到弹反状态
-        if (input.Player.CounterAttack.WasPressedThisFrame())
+        if (input.Player.CounterAttack.WasPressedThisFrame() && player.CanCounter())
         {
             stateMachine.ChangeState(player.counterAttackState);
             return; // 切换状态后直接 return，防止执行下面的移动逻辑

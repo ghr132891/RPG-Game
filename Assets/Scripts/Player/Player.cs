@@ -34,6 +34,9 @@ public class Player : Entity
     public Player_DomainExpansionState domainExpansionState { get; private set; }
     #endregion
 
+    [Header("Counter Attack Details")] // 【新增】：弹反冷却设置
+    public float counterCooldown = 1f;
+    private float counterCooldownTimer;
 
     [Header("Attack Details")]
     public Vector2[] attackVelocity;
@@ -127,7 +130,49 @@ public class Player : Entity
     {
         base.Update();
         ApplyWorldMovementLogic();
+
+        // 【新增】：弹反冷却计时
+        if (counterCooldownTimer > 0)
+        {
+            counterCooldownTimer -= Time.deltaTime;
+        }
+
+        // 每一帧检测玩家是否被机关墙壁彻底挤压
+        CheckIfCrushedByWall();
     }
+
+    private void CheckIfCrushedByWall()
+    {
+        if (stateMachine.currentState == deadState) return;
+
+        Collider2D col = GetComponent<Collider2D>();
+        if (col != null)
+        {
+            // 【核心优化】：获取玩家真实碰撞体的宽高，并缩小到 40%
+            // 这意味着只有当墙壁挤进玩家身体超过 30% 的深度时，才会触发死亡，完美防止滑墙误杀！
+            Vector2 crushCheckSize = new Vector2(col.bounds.size.x * 0.4f, col.bounds.size.y * 0.4f);
+
+            // 使用 OverlapBox 检测这个“内部核心框”是否碰到了地面/墙体图层
+            // 注意：这里需要借用 Entity 里的 whatIsGround，如果您在 Player 里没有引用，请确保它能获取到层级
+            bool isCrushed = Physics2D.OverlapBox(col.bounds.center, crushCheckSize, 0f, combat.GetComponent<Entity>().whatIsGround);
+            // （如果上面的 combat... 报错，请直接替换为您用来检测地面的 LayerMask，比如 1 << LayerMask.NameToLayer("Ground") ）
+
+            if (isCrushed)
+            {
+                Debug.Log("玩家被机关彻底挤压死亡！");
+
+                // 直接扣除最大生命值，或者直接调用 EntityDeath()
+                // health.TakeDamage(9999); 
+                EntityDeath();
+            }
+        }
+    }
+
+    // 【新增】：公开的三个冷却管理方法
+    public bool CanCounter() => counterCooldownTimer <= 0;
+    public void StartCounterCooldown() => counterCooldownTimer = counterCooldown;
+    public void ResetCounterCooldown() => counterCooldownTimer = 0;
+
     public void TeleportPlayer(Vector3 position) => transform.position = position;
 
     // 【新增】：获取受时间流速修正后的冲刺持续时间
@@ -305,6 +350,18 @@ public class Player : Entity
         else
         {
             Time.timeScale = 1f;
+        }
+    }
+
+    protected override void OnDrawGizmos()
+    {
+        base.OnDrawGizmos();
+        Collider2D col = GetComponent<Collider2D>();
+        if (col != null)
+        {
+            Gizmos.color = Color.red;
+            Vector2 crushCheckSize = new Vector2(col.bounds.size.x * 0.4f, col.bounds.size.y * 0.4f);
+            Gizmos.DrawWireCube(col.bounds.center, crushCheckSize);
         }
     }
 

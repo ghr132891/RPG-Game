@@ -11,7 +11,6 @@ public class Enemy_DeadState : EnemyState
 
     public override void Enter()
     {
-        // 1. 【最核心修复】：必须调用基类 Enter，这才会执行 anim.SetBool("dead", true) 触发动画！
         base.Enter();
 
         TimeRewinder rewinder = enemy.GetComponent<TimeRewinder>();
@@ -20,18 +19,30 @@ public class Enemy_DeadState : EnemyState
             rewinder.SetDead();
         }
 
-        // 2. 【最核心修复】：删除了 anim.enabled = false，让动画器保持开启状态！
+        // ==========================================
+        // 【核心修改区：尸体物理保留逻辑】
+        // ==========================================
 
-        // 3. 通用死亡物理处理（停在原地、取消碰撞）
-        if (col != null) col.enabled = false;
-        rb.bodyType = RigidbodyType2D.Kinematic;
-        rb.linearVelocity = Vector2.zero;
+        // 1. 绝对不能关闭碰撞体！让它继续触发压力板
+        // if (col != null) col.enabled = false; // （已注释掉）
 
-        // 4. 关闭状态机的 Update 循环，防止死后怪物还能乱动或触发其他逻辑
+        // 2. 保持刚体为 Dynamic（动态），让尸体受重力自然掉落到压力板上
+        rb.bodyType = RigidbodyType2D.Dynamic;
+
+        // 3. 将 X 轴速度清零防止尸体在地上无限滑行，但保留 Y 轴下落速度
+        rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+
+        // 4. 【关键体验优化】：切换到“尸体层”
+        // 这样尸体能压机关，但不会变成一堵墙挡住玩家的路
+        int corpseLayer = LayerMask.NameToLayer("Corpse");
+        if (corpseLayer != -1) // 确保你在 Unity 里建了这个层
+        {
+            enemy.gameObject.layer = corpseLayer;
+        }
+
+        // ==========================================
+
+        // 关闭状态机的 Update 循环
         stateMachine.SwitchOffStateMachine();
-
-        // （已删除旧的弹飞代码 rb.gravityScale = 10...）
-        // （已删除旧的定时销毁代码 enemy.DestoryGameObjectWithDealy...）
-        // 现在，怪物的销毁任务已经完美交给了我们之前设置的 Animation Event (SelfDestroyTrigger)
     }
 }

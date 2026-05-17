@@ -57,6 +57,49 @@ public class Enemy : Entity
 
     }
 
+    protected override void Update()
+    {
+        // 1. 必须保留 base.Update()，这样状态机才能正常运行
+        base.Update();
+
+        // 2. 每帧检测是否被卡进墙里
+        CheckIfStuckInGround();
+    }
+
+    private void CheckIfStuckInGround()
+    {
+        if (stateMachine.currentState == deadState) return;
+
+        Collider2D col = GetComponent<Collider2D>();
+        if (col != null)
+        {
+            // 1. 获取中心点极其微小范围内，所有属于 whatIsGround 图层的碰撞体
+            Collider2D[] colliders = Physics2D.OverlapCircleAll(col.bounds.center, 0.02f, whatIsGround);
+
+            bool isStuck = false;
+
+            // 2. 遍历所有碰到的“地面/墙体”
+            foreach (Collider2D hitCol in colliders)
+            {
+                // 【核心修复】：如果碰到的墙体，不是自己 (this.gameObject)
+                // 并且也不是挂在自己身上的子物体 (比如史莱姆的 platformCollider)
+                if (hitCol.gameObject != this.gameObject && !hitCol.transform.IsChildOf(this.transform))
+                {
+                    // 那说明是真的碰到了外面的墙壁！
+                    isStuck = true;
+                    break;
+                }
+            }
+
+            // 3. 只有真正卡进外墙，才执行秒杀
+            if (isStuck)
+            {
+                Debug.Log($"{gameObject.name} 被真的墙体卡住，执行防卡死秒杀！");
+                EntityDeath();
+            }
+        }
+    }
+
     public virtual void SpecialAttack()
     {
 
@@ -118,13 +161,32 @@ public class Enemy : Entity
 
     public RaycastHit2D PlayerDetected()
     {
-        // 【删除】actualFacingDir 判断，直接用 facingDir
-        RaycastHit2D hit =
-            Physics2D.Raycast(playerCheck.position, Vector2.right * facingDir, playerCheckDistance, whatIsPlayer | whatIsGround);
+        // 1. 获取射线轨迹上的【所有】物体
+        RaycastHit2D[] hits = Physics2D.RaycastAll(playerCheck.position, Vector2.right * facingDir, playerCheckDistance, whatIsPlayer | whatIsGround);
 
-        if (hit.collider == null || hit.collider.gameObject.layer != LayerMask.NameToLayer("Player"))
-            return default;
-        return hit;
+        foreach (RaycastHit2D hit in hits)
+        {
+            // 2. 忽略自己（主体碰撞体）和挂在身上的子物体（跳板 platformCollider）
+            if (hit.collider.gameObject == this.gameObject || hit.collider.transform.IsChildOf(this.transform))
+            {
+                continue; // 透明穿透，继续往后看
+            }
+
+            // 3. 视线穿透自己后，碰到的第一个物体如果是玩家，说明看到了！
+            if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Player"))
+            {
+                return hit;
+            }
+
+            // 4. 如果穿透自己后，碰到的第一个物体是真正的墙壁/地面，说明视线被墙挡住了
+            if (((1 << hit.collider.gameObject.layer) & whatIsGround) != 0)
+            {
+                return default;
+            }
+        }
+
+        // 什么都没看到
+        return default;
     }
 
     protected override void OnDrawGizmos()
