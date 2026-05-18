@@ -62,6 +62,12 @@ public class Player : Entity
     public float dashDuration = .25f;
     public float dashSpeed = 20;
 
+    [Header("Coyote Time Details")]
+    [Tooltip("离开平台边缘后仍允许跳跃的宽限时间（秒）")]
+    public float coyoteTime = 0.15f;
+    [HideInInspector]
+    public float coyoteTimeCounter; // 内部用于倒计时的变量
+
     public float activeSlowMultiplier { get; private set; } =1;
     public float TimeScaleFix => (WorldManager.Instance != null && Time.timeScale < 1f)
         ? (1f / WorldManager.Instance.timeWorldScale) : 1f;

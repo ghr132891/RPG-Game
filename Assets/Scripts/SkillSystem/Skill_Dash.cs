@@ -2,7 +2,15 @@ using UnityEngine;
 
 public class Skill_Dash : Skill_Base
 {
-   
+
+    public override bool CanUseSkill()
+    {
+        // 直接干掉，不让用
+        return false;
+
+        // 原本的代码可能是这样的，不用管它：
+        // return base.CanUseSkill() && skillUnlocked;
+    }
 
     public void OnStartEffect()
     {

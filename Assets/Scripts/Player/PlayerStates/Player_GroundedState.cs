@@ -9,12 +9,18 @@ public class Player_GroundedState : PlayerState
     public override void Update()
     {
         base.Update();
+        // 【新增】：只要玩家在地面状态，就一直重置土狼时间
+        player.coyoteTimeCounter = player.coyoteTime;
 
         if (rb.linearVelocity.y < 0 && player.groundDetected == false)
             stateMachine.ChangeState(player.fallState);
 
         if (input.Player.Jump.WasPressedThisFrame())
+        {
+            // 【新增】：主动起跳时立即清空土狼时间，防止跳跃到空中后还能触发判定
+            player.coyoteTimeCounter = 0;
             stateMachine.ChangeState(player.jumpState); 
+        }
 
         if (input.Player.Attack.WasPressedThisFrame())
             stateMachine.ChangeState(player.basicAttackState);

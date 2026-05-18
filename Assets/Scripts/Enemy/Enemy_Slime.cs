@@ -91,9 +91,9 @@ public class Enemy_Slime : Enemy, ICounterable
         {
             // 陷入虚弱：关闭物理碰撞（玩家可穿透），改变颜色或播放虚弱动画
             // 镜像界：关闭跳板，陷入虚弱
-            SetPlatformCollider(false);
-            GetComponent<Collider2D>().isTrigger = true;
-            anim.SetBool("isWeak", true);
+            SetPlatformCollider(true);
+            //GetComponent<Collider2D>().isTrigger = true;
+            //anim.SetBool("isWeak", true);
         }
         else
         {
@@ -101,7 +101,7 @@ public class Enemy_Slime : Enemy, ICounterable
             SetPlatformCollider(true);
             // 恢复正常
             GetComponent<Collider2D>().isTrigger = false;
-            anim.SetBool("isWeak", false);
+            //anim.SetBool("isWeak", false);
         }
     }
 
