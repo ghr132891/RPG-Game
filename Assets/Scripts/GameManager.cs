@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour,ISaveable
     public string lastScenePlayed;
     private bool dataLoaded;
 
+    [HideInInspector] public string lastActivatedCheckPointID;
     private void Awake()
     {
         if (instance != null && instance != this)
@@ -45,10 +46,18 @@ public class GameManager : MonoBehaviour,ISaveable
     public void ChangeScene(string sceneName, RespawnType respawnType)
     {
         // 在保存游戏之前，如果发现玩家是死的，立刻强行救活！
-        // 这样存进存档里的就是一个“满血活人”，完美避开读档时的 0 血覆盖 Bug！
         if (Player.instance != null && Player.instance.health.isDead)
         {
             Player.instance.health.Revive();
+        }
+
+        // ==========================================
+        // 【核心修复 1】：黑屏过渡期间，强行剥夺玩家的受伤判定！
+        // 绝对防止玩家在黑屏的这 1 秒内，由于物理模型还在机关里而被“二次鞭尸”扣血
+        // ==========================================
+        if (Player.instance != null)
+        {
+            Player.instance.health.SetCanTakeDamage(false);
         }
 
         SaveManager.instance.SaveGame();
@@ -56,6 +65,7 @@ public class GameManager : MonoBehaviour,ISaveable
         Time.timeScale = 1;
         StartCoroutine(ChangeScnenCo(sceneName, respawnType));
     }
+
     private IEnumerator ChangeScnenCo(string sceneName, RespawnType respawnType)
     {
         UI_FadeScreen fadeScreen = FindFadeScreenUI();
@@ -65,13 +75,19 @@ public class GameManager : MonoBehaviour,ISaveable
 
         SceneManager.LoadScene(sceneName);
 
-        dataLoaded = false;// data loaded becomes true when you load game from save manager
+        dataLoaded = false;
         yield return null;
 
-        while(dataLoaded == false)
+        while (dataLoaded == false)
         {
             yield return null;
         }
+
+        // ==========================================
+        // 【核心修复 2】：多等待一帧真实时间
+        // 让所有的 Inventory_Player、Start() 等装备加成计算彻底跑完，最大血量变成最终值
+        // ==========================================
+        yield return new WaitForEndOfFrame();
 
         fadeScreen = FindFadeScreenUI();
         fadeScreen.DoFadeIn(); // black > transperent
@@ -81,7 +97,12 @@ public class GameManager : MonoBehaviour,ISaveable
         if (player == null)
             yield break;
 
+        // 此时装备属性已彻底生效，这口奶绝对能奶到“真正的满血”
         player.health.Revive();
+
+        // 恢复正常受伤判定，玩家可以继续挨打了
+        player.health.SetCanTakeDamage(true);
+
         Vector3 position = GetNewPlayerPosition(respawnType);
 
         if (position != Vector3.zero)
@@ -110,28 +131,41 @@ public class GameManager : MonoBehaviour,ISaveable
             return position;
         }
 
-        if(type == RespawnType.NoneSpecific)
+        if (type == RespawnType.NoneSpecific)
         {
             var data = SaveManager.instance.GetGameData();
             var checkPoints = FindObjectsByType<Object_CheckPoint>(FindObjectsSortMode.None);
-            var unlockedCheckPoints = checkPoints
-                .Where(cp => data.unlockedCheckPoints.TryGetValue(cp.GetCheckPointID(), out bool unlocked) && unlocked)
-                .Select(cp => cp.GetPosition())
-                .ToList();
 
-            // add enterWayPoints ,choose the best way when player die in the middle of checkPoint and enterWayPoints.
+            // 1. 优先寻找玩家生前最后一次触碰的存档点（如果在当前场景内的话）
+            Object_CheckPoint lastPoint = checkPoints.FirstOrDefault(cp => cp.GetCheckPointID() == lastActivatedCheckPointID);
+
+            if (lastPoint != null && data.unlockedCheckPoints.TryGetValue(lastPoint.GetCheckPointID(), out bool isUnlocked) && isUnlocked)
+            {
+                return lastPoint.GetPosition(); // 完美找到！
+            }
+
+            // 2. 如果没找到（例如玩家刚进入一个新场景，还没摸过本场景的存档点就死了）
+            // 那么寻找离玩家最近的场景入口 (Enter WayPoint)
             var enterWayPoints = FindObjectsByType<Object_WayPoint>(FindObjectsSortMode.None)
                 .Where(wp => wp.GetWayPointType() == RespawnType.Enter)
                 .Select(wp => wp.GetPositionAndSetTriggerFalse())
                 .ToList();
 
-            var selectedPosition = unlockedCheckPoints.Concat(enterWayPoints).ToList(); // combine two lists into one.
+            if (enterWayPoints.Count > 0)
+            {
+                return enterWayPoints.OrderBy(p => Vector3.Distance(p, lastPlayerPosition)).First();
+            }
 
-            if (selectedPosition.Count == 0)
-                return Vector3.zero;
+            // 3. 终极兜底：如果连入口也没有，随便找一个本场景内已解锁的检查点
+            var unlockedCheckPoints = checkPoints
+                .Where(cp => data.unlockedCheckPoints.TryGetValue(cp.GetCheckPointID(), out bool unlocked) && unlocked)
+                .Select(cp => cp.GetPosition())
+                .ToList();
 
-            return selectedPosition.OrderBy(position => Vector3.Distance(position, lastPlayerPosition)).First(); // arrange from lowest to highest.
+            if (unlockedCheckPoints.Count > 0)
+                return unlockedCheckPoints.OrderBy(position => Vector3.Distance(position, lastPlayerPosition)).First();
 
+            return Vector3.zero;
         }
 
         return GetWayPointPosition(type);
@@ -155,6 +189,8 @@ public class GameManager : MonoBehaviour,ISaveable
         lastScenePlayed = gameData.lastScenePlayed;
         lastPlayerPosition = gameData.lastPlayerPosition;
 
+        lastActivatedCheckPointID = gameData.lastCheckPointID; // 【新增】读档
+
         if (string.IsNullOrEmpty(lastScenePlayed))
             lastScenePlayed = "Level_0";
 
@@ -177,6 +213,8 @@ public class GameManager : MonoBehaviour,ISaveable
 
         gameData.lastPlayerPosition = posToSave;
         gameData.lastScenePlayed = currentScene;
+
+        gameData.lastCheckPointID = lastActivatedCheckPointID; // 【新增】存档
 
         dataLoaded = false;
     }

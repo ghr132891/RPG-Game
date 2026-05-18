@@ -65,6 +65,12 @@ public class Object_CheckPoint : MonoBehaviour, ISaveable
         if (collision.GetComponent<Player>() != null)
         {
             ActivateCheckPoint(true);
+
+            // 【新增】：将自己设为全局最新的存档点 ID
+            if (GameManager.instance != null)
+            {
+                GameManager.instance.lastActivatedCheckPointID = checkPointID;
+            }
         }
     }
 

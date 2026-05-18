@@ -27,6 +27,7 @@ public class GameData
 
     public string lastScenePlayed;
     public Vector3 lastPlayerPosition;
+    public string lastCheckPointID; // 【新增】：记录最后一个激活的存档点ID
 
     public GameData()
     {
@@ -40,6 +41,7 @@ public class GameData
         skillUpgrades = new SerializeableDictionary<SkillType, SkillUpgradeType>();
         unlockedCheckPoints = new SerializeableDictionary<string, bool>();
         inScenePortals = new SerializeableDictionary<string, Vector3>();
+        lastCheckPointID = string.Empty;
     }
 
 }

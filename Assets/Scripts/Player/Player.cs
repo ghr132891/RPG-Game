@@ -62,6 +62,10 @@ public class Player : Entity
     public float dashDuration = .25f;
     public float dashSpeed = 20;
 
+    [Header("Fall Settings")]
+    [Tooltip("最大下落速度限制，数值越小落得越慢")]
+    public float maxFallSpeed = 15f;
+
     [Header("Coyote Time Details")]
     [Tooltip("离开平台边缘后仍允许跳跃的宽限时间（秒）")]
     public float coyoteTime = 0.15f;

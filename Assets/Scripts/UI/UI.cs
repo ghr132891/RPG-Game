@@ -54,6 +54,21 @@ public class UI : MonoBehaviour
     {
         skillTreeUI.UnlockDefaultSkills();
     }
+
+    // ================= 新增：订阅玩家死亡事件 =================
+    private void OnEnable()
+    {
+        // 只要 Player 广播了 OnPlayerDeadth，立刻无条件打开死亡界面
+        Player.OnPlayerDeadth += OpenDeathScreenUI;
+    }
+
+    private void OnDisable()
+    {
+        // 移除监听，防止报错
+        Player.OnPlayerDeadth -= OpenDeathScreenUI;
+    }
+
+
     private void StopPlayerControls(bool stopControls)
     {
         if (stopControls)

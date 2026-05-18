@@ -41,6 +41,10 @@ public class Enemy : Entity
     [SerializeField] private LayerMask whatIsPlayer;
     [SerializeField] private Transform playerCheck;
     [SerializeField] private float playerCheckDistance = 10;
+
+    [Header("Direction Setup")]
+    [Tooltip("勾选此项，怪物一出生就会朝左，且不会搞乱内部的 facingDir 逻辑")]
+    public bool faceLeftAtStart = true; // 默认设为 true，满足你所有的怪物初始朝左的需求
     public Transform player { get; private set; }
 
     public float activeSlowMultiplier { get; private set; } = 1;
@@ -55,6 +59,21 @@ public class Enemy : Entity
         combat = GetComponent<Entity_Combat>();
         vfx = GetComponent<Entity_VFX>();
 
+    }
+
+    protected override void Start()
+    {
+        base.Start();
+
+        // ========================================================
+        // 【新增】：初始化怪物朝向
+        // 如果要求朝左，且当前内部逻辑仍然是朝右(facingDir == 1)
+        // ========================================================
+        if (faceLeftAtStart && facingDir == 1)
+        {
+            Flip(); // 调用 Entity 父类的 Flip() 方法
+                    // 这会同时把 facingDir 变成 -1，facingRight 变成 false，并自动旋转模型
+        }
     }
 
     protected override void Update()

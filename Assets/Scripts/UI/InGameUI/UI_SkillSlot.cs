@@ -54,8 +54,12 @@ public class UI_SkillSlot : MonoBehaviour,IPointerEnterHandler,IPointerExitHandl
     public void StartCoolDown(float cooldown)
     {
         cooldownImage.fillAmount = 1;
-        StartCoroutine(CoolDownCo(cooldown));
 
+        // 【新增判断】：只有在当前节点处于激活（显示）状态时，才启动协程
+        if (gameObject.activeInHierarchy)
+        {
+            StartCoroutine(CoolDownCo(cooldown));
+        }
     }
 
     public void ResetCoolDown() => cooldownImage.fillAmount = 0;

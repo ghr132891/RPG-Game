@@ -10,6 +10,14 @@ public class Player_FallState : Player_AiredState
     {
         base.Update();
 
+        // 【新增】：限制最大下落速度，避免重力无限加速
+        // 注意：线性速度的 y 在下落时是负数，所以要比较 -maxFallSpeed
+        if (rb.linearVelocity.y < -player.maxFallSpeed)
+        {
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, -player.maxFallSpeed);
+        }
+
+
         // 【新增】：在下落状态中，减少土狼时间的计时
         if (player.coyoteTimeCounter > 0)
         {

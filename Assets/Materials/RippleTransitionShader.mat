@@ -44,11 +44,11 @@ Material:
     - _AberrationStrength: 0.02
     - _Distortion: 0.05
     - _EnableExternalAlpha: 0
-    - _Radius: 1.7330644
+    - _Radius: 2
     - _WaveWidth: 0.1
     - _ZWrite: 0
     m_Colors:
-    - _Center: {r: 0.5, g: 0.47964048, b: 0, a: 0}
+    - _Center: {r: 0.66071147, g: 0.3814056, b: 0, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
