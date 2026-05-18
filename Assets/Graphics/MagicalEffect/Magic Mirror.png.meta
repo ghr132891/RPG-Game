@@ -234,7 +234,12 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Magic Mirror_0: 6215118717711264765
+      Magic Mirror_1: 7197080618629431599
+      Magic Mirror_2: -7597723239820278675
+      Magic Mirror_3: -7307630053633034629
+      Magic Mirror_4: 56562965437902231
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

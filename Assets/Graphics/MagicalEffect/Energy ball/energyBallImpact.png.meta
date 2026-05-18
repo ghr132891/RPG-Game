@@ -1259,7 +1259,53 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      energyBallImpact_0: -2285897067133534271
+      energyBallImpact_1: -7569507464449144537
+      energyBallImpact_10: -354091845303242070
+      energyBallImpact_11: 6811977245022970403
+      energyBallImpact_12: -9195157792063299554
+      energyBallImpact_13: -9140196648192655757
+      energyBallImpact_14: -5019353072118670754
+      energyBallImpact_15: -1509481939093997352
+      energyBallImpact_16: -4180397653038936045
+      energyBallImpact_17: -712527099532460873
+      energyBallImpact_18: 4164794270020587370
+      energyBallImpact_19: 4177244317686809006
+      energyBallImpact_2: -6604419880948014333
+      energyBallImpact_20: -7335274397032053575
+      energyBallImpact_21: -8241814433536515220
+      energyBallImpact_22: -7492520160400600365
+      energyBallImpact_23: 4661409503929492082
+      energyBallImpact_24: 3325503965019983101
+      energyBallImpact_25: -1438109732195915613
+      energyBallImpact_26: -3678052892453792158
+      energyBallImpact_27: -2913419664118692136
+      energyBallImpact_28: 1629873714239746124
+      energyBallImpact_29: 3186360551816204681
+      energyBallImpact_3: 3146993007506642277
+      energyBallImpact_30: 4264612284724846930
+      energyBallImpact_31: -2227930009507888950
+      energyBallImpact_32: -5779281385227822688
+      energyBallImpact_33: -998501533775908452
+      energyBallImpact_34: -1469423075917399858
+      energyBallImpact_35: -5768522906172294382
+      energyBallImpact_36: 8758803889341626681
+      energyBallImpact_37: 587452765860538720
+      energyBallImpact_38: -4387251955497534639
+      energyBallImpact_39: 6254851287995471112
+      energyBallImpact_4: -6859689289103702929
+      energyBallImpact_40: -6484620921575230314
+      energyBallImpact_41: 2320149541801085028
+      energyBallImpact_42: -4889264501279628026
+      energyBallImpact_43: 8772194944845553115
+      energyBallImpact_44: -6383672256543560956
+      energyBallImpact_45: -4696122702201214538
+      energyBallImpact_5: -6299515613133978942
+      energyBallImpact_6: -4768488859681987944
+      energyBallImpact_7: -4179497919033087503
+      energyBallImpact_8: 1267634117508191879
+      energyBallImpact_9: -515359189159818116
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

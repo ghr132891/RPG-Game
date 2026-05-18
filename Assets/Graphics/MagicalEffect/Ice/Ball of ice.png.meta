@@ -209,7 +209,11 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Ball of ice_0: -1960111932677794457
+      Ball of ice_1: 3550801361450157579
+      Ball of ice_2: 3231008518335285065
+      Ball of ice_3: -4877759674473196381
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

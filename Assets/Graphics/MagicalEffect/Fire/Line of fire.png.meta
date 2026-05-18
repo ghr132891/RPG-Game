@@ -484,7 +484,22 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Line of fire_0: 2831783029213980966
+      Line of fire_1: 2125029477629824145
+      Line of fire_10: 9072372208448105664
+      Line of fire_11: -3921224753279395679
+      Line of fire_12: -650548969934829766
+      Line of fire_13: -3216427024967995853
+      Line of fire_14: -4378576495471041127
+      Line of fire_2: 2913503642380365109
+      Line of fire_3: 1261878174023125395
+      Line of fire_4: 1484030942168668129
+      Line of fire_5: 3341576128415176266
+      Line of fire_6: -6076447818960109422
+      Line of fire_7: 6144629511247823129
+      Line of fire_8: 715952044346300691
+      Line of fire_9: 1844749217294964809
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
