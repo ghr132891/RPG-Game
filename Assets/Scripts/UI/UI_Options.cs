@@ -76,5 +76,41 @@ public class UI_Options : MonoBehaviour
         bgmSlider.value = PlayerPrefs.GetFloat(bgmParameter, .6f);
     }
 
+    // ================= 新增：脱离卡死功能 =================
+    public void UnstuckPlayer()
+    {
+        // 确保能获取到玩家
+        if (player == null)
+            player = FindFirstObjectByType<Player>();
+
+        if (player != null && !player.health.isDead)
+        {
+            Debug.Log("玩家使用了脱离卡死功能！");
+
+            // 【强烈推荐方案】：直接赋予极大伤害，走正常的死亡复活流程
+            // 这样能彻底清空玩家可能卡住的物理速度和状态机，并回到上一个存档点
+            player.EntityDeath();
+
+            /* // 【备用方案】：无伤直接传送回存档点（如果你不想给死亡惩罚，可以使用这段代码并注释掉上面的受击代码）
+            Vector3 safePos = GameManager.instance.GetNewPlayerPosition(RespawnType.NoneSpecific);
+            if (safePos != Vector3.zero)
+            {
+                player.transform.position = safePos;
+                player.rb.linearVelocity = Vector2.zero; // 清除可能残留的异常速度
+                player.stateMachine.ChangeState(player.idleState); // 强制恢复站立
+            }
+            */
+
+            // 关闭设置界面 (隐藏 Options 面板)
+            gameObject.SetActive(false);
+
+            // 如果你打开 Options 时游戏暂停了（TimeScale = 0），必须在这里恢复时间，否则死亡动画会卡住
+            if (Time.timeScale == 0)
+            {
+                Time.timeScale = 1;
+            }
+        }
+    }
+    // ==========================================================
     public void GoMainMenuButton() => GameManager.instance.ChangeScene("MainMenu",RespawnType.NoneSpecific);
 }
