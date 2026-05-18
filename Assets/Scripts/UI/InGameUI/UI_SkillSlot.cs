@@ -35,6 +35,10 @@ public class UI_SkillSlot : MonoBehaviour,IPointerEnterHandler,IPointerExitHandl
 
     public void SetupSkillSlot(Skill_DataSO selectedSkill)
     {
+
+        // 【修复1】：如果界面未激活导致 Awake 还没运行，强制在这里获取一次组件
+        if (skillIcon == null) skillIcon = GetComponent<Image>();
+        if (ui == null) ui = GetComponentInParent<UI>();
         this.skillData = selectedSkill;
 
         Color color = Color.black; color.a = .6f;

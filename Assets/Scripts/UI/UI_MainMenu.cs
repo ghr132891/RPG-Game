@@ -58,10 +58,34 @@ public class UI_MainMenu : MonoBehaviour
         }
     }
 
-
+    public void PlayButtonSFX()
+    {
+        if (AudioManager.instance != null)
+        {
+            AudioManager.instance.StopBGM();
+            AudioManager.instance.PlayGlobalSFX("button_Click");
+        }
+    }
 
     public void QuitGameButton()
     {
-        Application.Quit();
+        if (AudioManager.instance != null)
+        {
+            AudioManager.instance.StopBGM();
+            AudioManager.instance.PlayGlobalSFX("button_Click");
+        }
+        Debug.Log("玩家点击了退出游戏！"); // 打印日志，方便你在控制台确认按钮被成功按下了
+
+        // 如果想用纯代码控制声音，也可以在这里加一句：
+        // AudioManager.instance.PlaySFX(音效ID, null);
+
+        // 兼容编辑器的退出逻辑
+#if UNITY_EDITOR
+        // 如果在 Unity 编辑器中，强制停止运行模式
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        // 如果是打包后的真实游戏，执行正式退出
+        Application.Quit(); 
+#endif
     }
 }

@@ -86,6 +86,10 @@ public class UI_TreeNode : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
     public void UnlockWithSaveData()
     {
+        // 【修复2】：防止因为读取存档早于 Start 执行而导致树状连线组件为空
+        if (treeConnectHandler == null)
+            GetNeededComponents();
+
         isUnlocked = true;
         UpdateIconColor(Color.white);
         LockConflictNodes();
@@ -134,6 +138,10 @@ public class UI_TreeNode : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     public void LockChildNodes()
     {
         isLocked = true;
+
+        // 【新增安全检测】防止连带锁定冲突节点时，子节点尚未初始化
+        if (treeConnectHandler == null)
+            GetNeededComponents();
 
         foreach (var node in treeConnectHandler.GetChildNodes())
         {

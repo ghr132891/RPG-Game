@@ -25,7 +25,21 @@ public class UI_Options : MonoBehaviour
     {
         player = FindFirstObjectByType<Player>();
 
-        healthBarTooggle.onValueChanged.AddListener(OnHealthBarToggleChanged);
+        // 加上判空保护
+        if (healthBarTooggle != null)
+        {
+            healthBarTooggle.onValueChanged.AddListener(OnHealthBarToggleChanged);
+        }
+
+    }
+
+    public void PlayButtonSFX()
+    {
+        if (AudioManager.instance != null)
+        {
+            AudioManager.instance.StopBGM();
+            AudioManager.instance.PlayGlobalSFX("button_Click");
+        }
     }
 
     public void BGMSliderValue(float value)  

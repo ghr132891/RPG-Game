@@ -1,9 +1,13 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+[RequireComponent(typeof(Collider2D))] // 强制要求挂载碰撞体
 public class MirrorZone : MonoBehaviour
 {
     private bool isCurrentlyMirrored = false;
+
+    // 【新增】：用于记录玩家是否在当前镜像区域内
+    private bool isPlayerInside = false;
 
     [Header("调试")]
     [Tooltip("这里会显示代码自动算出来的实际贴图中心X坐标（本地坐标）")]
@@ -11,6 +15,10 @@ public class MirrorZone : MonoBehaviour
 
     private void Start()
     {
+        // 确保挂在身上的 Collider 是 Trigger 模式
+        Collider2D col = GetComponent<Collider2D>();
+        if (col != null) col.isTrigger = true;
+
         // 游戏开始时，自动计算已画贴图的真实中心
         CalculateRealTilemapCenter();
 
@@ -18,17 +26,36 @@ public class MirrorZone : MonoBehaviour
         {
             WorldManager.Instance.OnWorldChanged += HandleWorldChanged;
 
-            if (WorldManager.Instance.isMirrored)
+            // 初始化时如果已经是镜像状态，也检查一下（通常游戏开始是 Normal）
+            if (WorldManager.Instance.isMirrored && isPlayerInside)
             {
                 ExecuteFlip();
             }
         }
     }
 
-    // ================= 新增：核心计算逻辑 =================
+    // ================= 新增：检测玩家进出区域 =================
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        // 检测进入的是否是玩家
+        if (collision.GetComponent<Player>() != null)
+        {
+            isPlayerInside = true;
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        // 检测离开的是否是玩家
+        if (collision.GetComponent<Player>() != null)
+        {
+            isPlayerInside = false;
+        }
+    }
+    // ==========================================================
+
     private void CalculateRealTilemapCenter()
     {
-        // 获取房间内所有的 Tilemap (比如可能分了地面层、墙壁层、背景层)
         Tilemap[] tilemaps = GetComponentsInChildren<Tilemap>();
 
         if (tilemaps.Length == 0)
@@ -43,42 +70,49 @@ public class MirrorZone : MonoBehaviour
 
         foreach (Tilemap tm in tilemaps)
         {
-            // 【关键步骤】强制 Tilemap 丢弃之前画错又擦除的空白区域，完美贴合现有砖块
             tm.CompressBounds();
-
-            // 获取这个 Tilemap 的渲染器
             TilemapRenderer renderer = tm.GetComponent<TilemapRenderer>();
             if (renderer != null)
             {
                 if (isFirst)
                 {
-                    combinedBounds = renderer.bounds; // 记录第一个边界 (世界坐标)
+                    combinedBounds = renderer.bounds;
                     isFirst = false;
                 }
                 else
                 {
-                    combinedBounds.Encapsulate(renderer.bounds); // 把其他层的边界包进来，合并成一个大边界
+                    combinedBounds.Encapsulate(renderer.bounds);
                 }
             }
         }
 
-        // combinedBounds.center 算出来的是“世界坐标系”下的正中心。
-        // 因为你的翻转代码是用的 localPosition，所以我们要把它转换成本地坐标X
         Vector3 localCenter = transform.InverseTransformPoint(combinedBounds.center);
         calculatedAxisX = localCenter.x;
-
-        Debug.Log($"[{gameObject.name}] 成功计算出贴图真实中心，本地X轴为: {calculatedAxisX}");
     }
-    // ======================================================
 
+    // ================= 修改：只在玩家在内部时才镜像 =================
     private void HandleWorldChanged(WorldType newWorld)
     {
-        bool targetMirrored = WorldManager.Instance.isMirrored;
-        if (isCurrentlyMirrored != targetMirrored)
+        bool globalMirrored = WorldManager.Instance.isMirrored;
+
+        if (globalMirrored)
         {
-            ExecuteFlip();
+            // 全局切为镜像：只有玩家在区域内，且区域还没被翻转，才执行翻转
+            if (isPlayerInside && !isCurrentlyMirrored)
+            {
+                ExecuteFlip();
+            }
+        }
+        else
+        {
+            // 全局切为正常/时间：如果当前区域之前被翻转了，那么强制恢复（无论玩家在不在里面）
+            if (isCurrentlyMirrored)
+            {
+                ExecuteFlip();
+            }
         }
     }
+    // ================================================================
 
     private void ExecuteFlip()
     {
@@ -86,11 +120,9 @@ public class MirrorZone : MonoBehaviour
 
         foreach (Transform child in transform)
         {
-            // 1. 物理位置翻转：以我们算出来的 calculatedAxisX 为基准对称翻转
             float newX = (2 * calculatedAxisX) - child.localPosition.x;
             child.localPosition = new Vector3(newX, child.localPosition.y, child.localPosition.z);
 
-            // 2. 状态与朝向翻转
             Entity entity = child.GetComponent<Entity>();
             if (entity != null)
             {
@@ -104,7 +136,6 @@ public class MirrorZone : MonoBehaviour
             }
             else
             {
-                // 注意：如果普通物件是 Tilemap 本身，这里翻转它的 Scale
                 child.localScale = new Vector3(-child.localScale.x, child.localScale.y, child.localScale.z);
             }
         }
@@ -118,23 +149,14 @@ public class MirrorZone : MonoBehaviour
         }
     }
 
-    // ================= 新增：画线辅助，不用运行游戏就能看到中心在哪 =================
     private void OnDrawGizmosSelected()
     {
-        // 哪怕没运行游戏，只要你选中了这个房间，它就会尝试算一下中心并在场景里画出来
         CalculateRealTilemapCenter();
-
         Gizmos.color = Color.green;
-
-        // 算出世界坐标的中心轴位置
         Vector3 worldCenterPoint = transform.TransformPoint(new Vector3(calculatedAxisX, 0, 0));
-
-        // 画一条绿色的垂直辅助线
         Vector3 top = worldCenterPoint + new Vector3(0, 20f, 0);
         Vector3 bottom = worldCenterPoint + new Vector3(0, -20f, 0);
         Gizmos.DrawLine(top, bottom);
-
-        // 画一个小球标记中心
         Gizmos.DrawSphere(worldCenterPoint, 0.3f);
     }
 }
