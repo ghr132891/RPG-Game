@@ -259,7 +259,13 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Effect4 Gameboy Spritesheet_0: 1931907997808703191
+      Effect4 Gameboy Spritesheet_1: -2568486100390156612
+      Effect4 Gameboy Spritesheet_2: -8742184222370633834
+      Effect4 Gameboy Spritesheet_3: 7497595771070054013
+      Effect4 Gameboy Spritesheet_4: -1084499001801963446
+      Effect4 Gameboy Spritesheet_5: 4701610181469641962
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

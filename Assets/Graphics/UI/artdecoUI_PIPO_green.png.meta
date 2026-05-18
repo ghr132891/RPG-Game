@@ -559,7 +559,25 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      artdecoUI_PIPO_green_0: -5513402705069926028
+      artdecoUI_PIPO_green_1: -1592423904422635470
+      artdecoUI_PIPO_green_10: 1303015732115467491
+      artdecoUI_PIPO_green_11: -3057704949654658815
+      artdecoUI_PIPO_green_12: 5354338242756208132
+      artdecoUI_PIPO_green_13: 4994640973152106856
+      artdecoUI_PIPO_green_14: -1806650731342574444
+      artdecoUI_PIPO_green_15: 8603743856913377706
+      artdecoUI_PIPO_green_16: 7819521628769349839
+      artdecoUI_PIPO_green_17: 2285679445171170318
+      artdecoUI_PIPO_green_2: -6288476618548384253
+      artdecoUI_PIPO_green_3: -6912272801481362850
+      artdecoUI_PIPO_green_4: -9032370388249336505
+      artdecoUI_PIPO_green_5: 8694742198542771373
+      artdecoUI_PIPO_green_6: -8857898435174837503
+      artdecoUI_PIPO_green_7: 1310296053191254394
+      artdecoUI_PIPO_green_8: -3695363473261593040
+      artdecoUI_PIPO_green_9: 3897282894046102653
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      lever_wall_3_0: 4662606782529443167
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

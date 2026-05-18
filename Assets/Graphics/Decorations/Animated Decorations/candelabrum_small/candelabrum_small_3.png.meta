@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      candelabrum_small_3_0: 8943498007946141613
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
