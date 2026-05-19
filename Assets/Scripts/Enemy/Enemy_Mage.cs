@@ -90,6 +90,12 @@ public class Enemy_Mage : Enemy, ICounterable
         }
     }
 
+    protected override void Update()
+    {
+        base.Update();
+        EvaluateVulnerability();
+    }
+
     private void CheckMirrorWorld(WorldType worldType)
     {
         // 替换掉原来的逻辑，直接调用统一判定

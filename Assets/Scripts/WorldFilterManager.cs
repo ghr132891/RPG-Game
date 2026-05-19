@@ -171,4 +171,36 @@ public class WorldFilterManager : MonoBehaviour
             audioSource.PlayOneShot(clip);
         }
     }
+
+    // ==========================================
+    // 【新增】：专供法师/被动触发时间回溯时，临时开启时间滤镜！
+    // ==========================================
+    public void ToggleTimeRewindEffect(bool isActive)
+    {
+        if (isActive)
+        {
+            // 开启强制回溯特效：播放倒带音效、开启黑白后处理、开启屏幕材质
+            PlaySFX(timeRewindSFX);
+            if (timeWorldVolume != null) timeWorldVolume.weight = 1;
+
+            if (transitionScreen != null && timeMaterial != null)
+            {
+                transitionScreen.material = timeMaterial;
+                transitionScreen.enabled = true;
+            }
+        }
+        else
+        {
+            // 关闭特效时的【安全判定】：
+            // 如果玩家刚好原本就处在“时间世界”里，那就不要关掉特效！
+            if (WorldManager.Instance != null && WorldManager.Instance.currentWorld == WorldType.Time)
+            {
+                return;
+            }
+
+            // 恢复正常画面
+            if (timeWorldVolume != null) timeWorldVolume.weight = 0;
+            if (transitionScreen != null) transitionScreen.enabled = false;
+        }
+    }
 }

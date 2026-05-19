@@ -17,8 +17,8 @@ public class Player_TimeRewinder : MonoBehaviour
     private Rigidbody2D rb;
 
     [Header("Rewind Settings")]
-    public float recordTime = 5f;
-    public float rewindPlaybackDuration = 1.5f;
+    public float recordTime = 3f;
+    public float rewindPlaybackDuration = 3f;
 
     public bool isRewinding { get; private set; }
 
@@ -77,25 +77,45 @@ public class Player_TimeRewinder : MonoBehaviour
     {
         isRewinding = true;
 
-        // 冻结状态机与物理
+        // 【终极防御 1】：强制保证至少有 3 秒的播放时间（防止面板数据被覆盖）
+        float actualDuration = Mathf.Max(3f, rewindPlaybackDuration);
+        Debug.Log($"<color=cyan>【时间回溯开始】开启护城河模式，预计持续时间: {actualDuration} 秒</color>");
+
+        // 首次开启特效
+        if (WorldFilterManager.Instance != null)
+        {
+            WorldFilterManager.Instance.ToggleTimeRewindEffect(true);
+        }
+
+        // 冻结状态机、物理、碰撞器、动画流速
         player.enabled = false;
         rb.bodyType = RigidbodyType2D.Kinematic;
         rb.linearVelocity = Vector2.zero;
-
         Collider2D col = GetComponent<Collider2D>();
         if (col != null) col.enabled = false;
-
-        // 3. 【冻结动画】：暂停 Animator 自带的时间流逝，完全由我们手动控制！
         player.anim.speed = 0f;
 
         float timer = 0f;
         int totalPoints = pointsInTime.Count;
 
-        while (timer < rewindPlaybackDuration)
+        while (timer < actualDuration)
         {
-            timer += Time.deltaTime;
+            timer += Time.unscaledDeltaTime;
 
-            float t = Mathf.Clamp01(timer / rewindPlaybackDuration);
+            // ==========================================
+            // 【终极防御 2】：滤镜续命！
+            // 防止法师切换状态或场景重置时把特效意外关掉。
+            // 只要我还在回溯，谁也别想黑掉我的滤镜！
+            // ==========================================
+            if (WorldFilterManager.Instance != null)
+            {
+                if (WorldFilterManager.Instance.transitionScreen != null)
+                    WorldFilterManager.Instance.transitionScreen.enabled = true; // 死死保住 UI
+                if (WorldFilterManager.Instance.timeWorldVolume != null)
+                    WorldFilterManager.Instance.timeWorldVolume.weight = 1f;     // 死死保住后处理
+            }
+
+            float t = Mathf.Clamp01(timer / actualDuration);
             float floatIndex = Mathf.Lerp(0, totalPoints - 1, t);
 
             int indexA = Mathf.FloorToInt(floatIndex);
@@ -103,29 +123,28 @@ public class Player_TimeRewinder : MonoBehaviour
 
             float fraction = floatIndex - indexA;
 
-            // --- 还原物理位置 ---
+            // 还原物理位置
             Vector3 smoothPosition = Vector3.Lerp(pointsInTime[indexA].position, pointsInTime[indexB].position, fraction);
             rb.MovePosition(smoothPosition);
 
-            // --- 4. 还原玩家朝向 ---
+            // 还原玩家朝向
             if (player.facingDir != pointsInTime[indexA].facingDir)
             {
-                player.Flip(); // 调用 Entity 基类的 Flip 方法来翻转人物
+                player.Flip();
             }
 
-            // --- 5. 还原全姿态动画！ ---
-            // 强行指定 Animator 播放特定的哈希状态，并精确定位到当时的时间点
+            // 还原全姿态动画
             player.anim.Play(pointsInTime[indexA].animStateHash, 0, pointsInTime[indexA].animNormalizedTime);
 
             yield return null;
         }
 
+        Debug.Log("<color=cyan>【时间回溯结束】完成完整倒放！</color>");
+
         // 精确收尾
         if (totalPoints > 0)
         {
             rb.MovePosition(pointsInTime[totalPoints - 1].position);
-
-            // 恢复最后时刻的朝向和动画
             if (player.facingDir != pointsInTime[totalPoints - 1].facingDir) player.Flip();
             player.anim.Play(pointsInTime[totalPoints - 1].animStateHash, 0, pointsInTime[totalPoints - 1].animNormalizedTime);
         }
@@ -135,11 +154,15 @@ public class Player_TimeRewinder : MonoBehaviour
         // 恢复控制与物理
         rb.bodyType = RigidbodyType2D.Dynamic;
         if (col != null) col.enabled = true;
-
-        // 6. 【解冻动画】：恢复正常游戏动画播放速率
         player.anim.speed = 1f;
 
         player.enabled = true;
         isRewinding = false;
+
+        // 倒放彻底结束，才允许关闭特效
+        if (WorldFilterManager.Instance != null)
+        {
+            WorldFilterManager.Instance.ToggleTimeRewindEffect(false);
+        }
     }
 }

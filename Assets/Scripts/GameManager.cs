@@ -208,7 +208,7 @@ public class GameManager : MonoBehaviour, ISaveable
         lastActivatedCheckPointID = gameData.lastCheckPointID;
 
         if (string.IsNullOrEmpty(lastScenePlayed))
-            lastScenePlayed = "Level_0";
+            lastScenePlayed = "Level_Sleeping Mine_1";
 
         dataLoaded = true;
     }

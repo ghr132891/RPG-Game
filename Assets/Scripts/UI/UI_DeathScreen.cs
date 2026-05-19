@@ -3,10 +3,7 @@ using UnityEngine.SceneManagement;
 
 public class UI_DeathScreen : MonoBehaviour
 {
-    public void GoToCampButton()
-    {
-        GameManager.instance.ChangeScene("Level_0",RespawnType.NoneSpecific);
-    }
+
 
     public void GoToCheckPointButton()
     {
