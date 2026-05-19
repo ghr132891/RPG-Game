@@ -32,7 +32,10 @@ public class UI_GameStartTransition : MonoBehaviour
     public ParticleSystem ashParticles;
 
     private Material dissolveMaterial;
+<<<<<<< Updated upstream
     private Material originalMaterial; // 【新增】：用于记录原始材质
+=======
+>>>>>>> Stashed changes
     private int progressParamID = Shader.PropertyToID("_Progress");
 
     private void Awake()
@@ -101,6 +104,7 @@ public class UI_GameStartTransition : MonoBehaviour
 
     private void OnDestroy()
     {
+<<<<<<< Updated upstream
         // 【核心修复】：先把原始材质还给图片，防止 Unity 序列化检查报错
         if (animatedImage != null && originalMaterial != null)
         {
@@ -108,5 +112,8 @@ public class UI_GameStartTransition : MonoBehaviour
         }
         if (dissolveMaterial != null)
             Destroy(dissolveMaterial);
+=======
+        if (dissolveMaterial != null) Destroy(dissolveMaterial);
+>>>>>>> Stashed changes
     }
 }

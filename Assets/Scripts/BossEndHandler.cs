@@ -52,6 +52,7 @@ public class BossEndHandler : MonoBehaviour
         {
             gameCompletePanel.SetActive(true);
 
+<<<<<<< Updated upstream
             // ================= 【核心新增：禁用玩家输入】 =================
             // 找到场景中的玩家实体
             Player player = FindFirstObjectByType<Player>();
@@ -73,6 +74,11 @@ public class BossEndHandler : MonoBehaviour
             // Time.timeScale = 0f;
         }
 
+=======
+            // 如果你希望弹出按钮时游戏暂停，可以解锁下面这行：
+            // Time.timeScale = 0f; 
+        }
+>>>>>>> Stashed changes
     }
 
     private void OnEndButtonClick()
