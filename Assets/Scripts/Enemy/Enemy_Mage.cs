@@ -310,7 +310,7 @@ public class Enemy_Mage : Enemy, ICounterable
     public bool CanNotMoveBackwards()
     {
         bool detectedWall = Physics2D.Raycast(behindCollsionCheck.position, Vector2.right * -facingDir, 4f, whatIsGround);
-        bool noGround = Physics2D.Raycast(behindCollsionCheck.position, Vector2.down, 4f, whatIsGround) == false;
+        bool noGround = Physics2D.Raycast(behindCollsionCheck.position, Vector2.down, 6f, whatIsGround) == false;
 
         return noGround || detectedWall;
     }
@@ -347,7 +347,7 @@ public class Enemy_Mage : Enemy, ICounterable
             new Vector3(behindCollsionCheck.position.x + (4f * -facingDir), behindCollsionCheck.position.y));
 
         Gizmos.DrawLine(behindCollsionCheck.position,
-            new Vector3(behindCollsionCheck.position.x, behindCollsionCheck.position.y - 4f));
+            new Vector3(behindCollsionCheck.position.x, behindCollsionCheck.position.y - 6f));
     }
 
 

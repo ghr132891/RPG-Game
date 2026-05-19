@@ -160,7 +160,7 @@ public class Player : Entity
         {
             // 【核心优化】：获取玩家真实碰撞体的宽高，并缩小到 40%
             // 这意味着只有当墙壁挤进玩家身体超过 30% 的深度时，才会触发死亡，完美防止滑墙误杀！
-            Vector2 crushCheckSize = new Vector2(col.bounds.size.x * 0.4f, col.bounds.size.y * 0.4f);
+            Vector2 crushCheckSize = new Vector2(col.bounds.size.x * 0.1f, col.bounds.size.y * 0.1f);
 
             // 使用 OverlapBox 检测这个“内部核心框”是否碰到了地面/墙体图层
             // 注意：这里需要借用 Entity 里的 whatIsGround，如果您在 Player 里没有引用，请确保它能获取到层级
@@ -321,7 +321,7 @@ public class Player : Entity
 
         input.Player.SwitchNormal.performed += ctx => skillManager.normalSwitch.TryUseSkill();
         input.Player.SwitchMirror.performed += ctx => skillManager.mirrorSwitch.TryUseSkill();
-        input.Player.SwitchTime.performed += ctx => skillManager.timeSwitch.TryUseSkill();
+        //input.Player.SwitchTime.performed += ctx => skillManager.timeSwitch.TryUseSkill();
 
 
 
