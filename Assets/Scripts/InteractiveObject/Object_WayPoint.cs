@@ -48,6 +48,7 @@ public class Object_WayPoint : MonoBehaviour
     private void Update()
     {
         HandleToolTipFloat();
+        
 
 
         if (isPlayerInZone && canBeTriggered)
@@ -71,6 +72,7 @@ public class Object_WayPoint : MonoBehaviour
     {
         if (canBeTriggered == false)
             return;
+        startPosition = interactToolTip.transform.position;
         interactToolTip.SetActive(true);
 
         // 【修改】：不再直接传送，而是标记玩家进入了区域
@@ -83,6 +85,7 @@ public class Object_WayPoint : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
+        startPosition = interactToolTip.transform.position;
         interactToolTip.SetActive(false);
         // 【修改】：玩家离开时，取消标记
         if (collision.GetComponent<Player>() != null)

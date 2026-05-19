@@ -1,16 +1,16 @@
 fileFormatVersion: 2
-guid: 99bcba2e51ee9224da972b0ba4636140
+guid: 3981beb7767e7d4448cafba1e1d10a66
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 5760202260919997367
-    second: BackGround_0
+      213: -6435818893992669501
+    second: BackGround_specular normal Map_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
-    sRGBTexture: 1
+    sRGBTexture: 0
     linearTexture: 0
     fadeOut: 0
     borderMipMap: 0
@@ -53,7 +53,7 @@ TextureImporter:
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 32
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
-  spriteGenerateFallbackPhysicsShape: 0
+  spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
   spriteTessellationDetail: -1
@@ -100,7 +100,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: BackGround_0
+      name: BackGround_specular normal Map_0
       rect:
         serializedVersion: 2
         x: 0
@@ -108,15 +108,15 @@ TextureImporter:
         width: 2150
         height: 1200
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 7b3d98cff6950ff40800000000000000
-      internalID: 5760202260919997367
+      spriteID: 3cec1d870d06fa6a0800000000000000
+      internalID: -6435818893992669501
       vertices: []
       indices: 
       edges: []
@@ -126,18 +126,16 @@ TextureImporter:
     physicsShape: []
     bones: []
     spriteID: 5e97eb03825dee720800000000000000
-    internalID: 1537655665
+    internalID: 0
     vertices: []
     indices: 
     edges: []
     weights: []
-    secondaryTextures:
-    - texture: {fileID: 2800000, guid: 3981beb7767e7d4448cafba1e1d10a66, type: 3}
-      name: _NormalMap
+    secondaryTextures: []
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      BackGround_0: 5760202260919997367
+      BackGround_specular normal Map_0: -6435818893992669501
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
